@@ -1,0 +1,323 @@
+%%
+% Load in krill lengths from trawls and calculate length stats in various
+% ways (by vessel, by strata, by cluster).
+
+baseDir = 'I:\KRILL2019';
+repoDir = '2019Area48SurveyRepo';
+resultsDir = fullfile(baseDir, repoDir, 'results');
+dataDir = fullfile(baseDir, 'data', 'catch');
+
+clear stats
+
+% Load in the krill length data from the various ships
+lf_raw = load_lf_data(dataDir);
+
+% Some stats about the trawls
+vessels = unique({lf_raw.vessel});
+for i = 1:length(vessels)
+    j = find(strcmp({lf_raw.vessel}, vessels{i}));
+    ll = cat(1,lf_raw(j).lengths);
+    
+    stats.vessel(i) = struct('vessel', vessels{i}, ...
+        'mean', mean(ll), ...
+        'std', std(ll), 'min', min(ll), ...
+        'max', max(ll), 'numLengths', length(ll), ...
+        'numStations', length(j));
+end
+
+% Some stats per station
+stats.station.mean = arrayfun(@(x) mean(x.lengths), lf_raw);
+stats.station.mean_text = cellstr(num2str(stats.station.mean', '%.f'))';
+stats.station.std = arrayfun(@(x) std(x.lengths), lf_raw);
+stats.station.num = arrayfun(@(x) length(x.lengths), lf_raw);
+
+% Store the min and max lengths for each station.
+for i = 1:length(stats.station.num)
+    if stats.station.num(i) > 0
+        stats.station.min(i) = min(lf_raw(i).lengths);
+        stats.station.max(i) = max(lf_raw(i).lengths);
+    else
+        stats.station.min(i) = NaN;
+        stats.station.max(i) = NaN;
+    end
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Clustering, as per the EMM report (and hence similar to the 2000 CCAMLR method)
+% Uses the Matlab statistics toolbox functions.
+
+% only do this on trawls with more than minNumKrill krill 
+minNumKrill = 20;
+stationsToUse = find(stats.station.num >= minNumKrill);
+stationsToNotUse = find(stats.station.num < minNumKrill);
+
+% update the vessel_stats structure to have how many trawls were used
+for i = 1:length(stats.vessel)
+    stats.vessel(i).numClusteredStations = sum(stats.station.num >= minNumKrill & ...
+        strcmp({lf_raw.vessel}, stats.vessel(i).vessel));
+end
+
+% combine all lf data into a length-binned single matrix.
+min_l = min(stats.station.min(stationsToUse)); % min krill length
+max_l = max(stats.station.max(stationsToUse)); % max krill length
+lengths = min_l:1:max_l; % bins
+
+X = zeros(length(lf_raw(stationsToUse)), length(lengths));
+for i = 1:length(lf_raw(stationsToUse))
+    bins = histcounts(lf_raw(stationsToUse(i)).lengths, [lengths lengths(end)+1]);
+    if sum(bins) > 0
+        X(i,:) = bins;
+    else
+        X(i,:) = nan(size(bins));
+    end
+end
+
+% Do the hierarchical clustering.
+
+% TODO:
+% log2 transform (log2(a+1) a = number of individuals in a length class,
+% center on a zero mean, and standarise to unit variance
+Xd = log2(X+1);
+m = mean(Xd, 2);
+s = std(Xd, 0, 2);
+Xd = (Xd - repmat(m, 1, size(Xd, 2))) ./ repmat(s, 1, size(Xd, 2));
+
+D = pdist(X, 'euclidean');
+Z = linkage(D, 'ward');
+clusters = cluster(Z, 'MaxClust',3);
+% This does it in one go, but we don't get the data necessary to draw a
+% dendrogram.
+%T = clusterdata(X, 'Distance', 'euclidean', 'Linkage', 'ward', 'MaxClust', 3);
+
+% how good was the clustering?
+aggloCoeff = cophenet(Z, D)
+
+% stats per cluster
+for i = 1:length(unique(clusters))
+    j = clusters == i;
+    ll = cat(1,lf_raw(stationsToUse(j)).lengths);
+    stats.cluster(i) = struct('cluster', ['Cluster ' num2str(i)], ...
+        'mean', mean(ll), 'std', std(ll), 'min', min(ll), ...
+        'max', max(ll),  'numLengths', length(ll), ...
+        'numStations', sum(j), 'stationIndex', stationsToUse(j));
+
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% And now the lf per stratum
+
+% Load survey strata
+strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey strata.geojson')));
+
+% and calculate some stats
+for i = 1:length(strata.features)
+    poly = squeeze(strata.features(i).geometry.coordinates);
+    in = inpolygon([lf_raw.lon], [lf_raw.lat], poly(:,1), poly(:,2));
+    ll = cat(1, lf_raw(in).lengths);
+    stats.strata(i) = struct('stratum', strata.features(i).properties.stratum, ...
+        'mean', mean(ll), ...
+        'std', std(ll), 'min', min(ll), ...
+        'max', max(ll),  'numLengths', length(ll), ...
+        'numStations', sum(in));
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Output the results in various ways:
+
+% Summary of trawls per vessel
+disp('Trawls by vessel:')
+disp(struct2table(stats.vessel))
+% Summary of trawls per strata
+disp('Trawls by strata:')
+disp(struct2table(stats.strata))
+% Summary of trawls per cluster
+disp('Trawls by cluster:')
+disp(struct2table(stats.cluster))
+
+% save the results from the processing
+save(fullfile(resultsDir, 'Trawls - data'), 'lf_raw', 'stats', 'aggloCoeff');
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do some plots
+
+figure(1) % Cluster lfs
+clf
+for i = 1:length(unique(clusters))
+    subplot(length(unique(clusters)), 1, i)
+    j = clusters == i;
+    histogram(cat(1,lf_raw(stationsToUse(j)).lengths), lengths)
+    textLoc(['Cluster ' num2str(i)], 'NorthWest');
+end
+xlabel('Length (mm)')
+print(fullfile(resultsDir, 'Trawls - cluster lf'), '-dpng','-r300')
+
+figure(2) % Dendrogram of clusters
+dendrogram(Z)
+print(fullfile(resultsDir, 'Trawls - dendrogram'), '-dpng','-r300')
+
+figure(3) % Map of stations, clusters, and strata
+plot_standard_map(strata)
+
+% plot the station positions
+clear h labels
+
+% Plot the stations that weren't used
+for i = 1:length(stationsToNotUse)
+    h(1) = m_scatter([lf_raw(stationsToNotUse(i)).lon], ...
+        [lf_raw(stationsToNotUse(i)).lat], 20, 'k');
+end
+labels{1} = 'Not used';
+    
+% Plot the stations that were used in the clustering
+for i = 1:length(unique(clusters))
+    j = clusters == i;
+    ii = stationsToUse(j);
+    h(i+1) = m_scatter([lf_raw(ii).lon], [lf_raw(ii).lat], 20, 'filled');
+    labels{i+1} = ['C' num2str(i)];
+end
+
+m_grid('box', 'on')
+h = legend(h, labels, 'Location', 'southeast');
+title(h, 'Clusters')
+
+print(fullfile(resultsDir, 'Trawls - map'), '-dpng','-r300')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function lf = load_lf_data(dataDir)
+    % Am only interested in the length-frequencies, so will reduce the
+    % datasets to this if not already...
+
+    k = 1;
+    
+    % RRS Discovery
+    disp('Loading RSS Discovery data')
+    c = readtable(fullfile(dataDir, 'RSS.xlsx'));
+    s = readtable(fullfile(dataDir, 'RSS_station_info.csv'));
+
+    stations = unique(c.Event_number);
+    for i = 1:length(stations)
+        j = c.Event_number == stations(i);
+        
+        kk = find(s.EventNo == stations(i) & strcmp(s.Action, 'Net 1 opened'));
+        if length(kk) ~= 1
+            warning('No single station info found')
+        end
+        
+        lf(k) = struct('vessel', 'RSS', 'station', stations(i), ...
+            'lengths', c.Length(j), ...
+            'lat', s.Latitude(kk), 'lon', s.Longitude(kk), ...
+            'timestamp', datenum(s.timestamp(kk)));
+        k = k + 1;
+    end
+    
+    % More Sodruzhestva
+    disp('Loading More Sodruzhestva data')
+    c = readtable(fullfile(dataDir, 'MS.xlsx'), 'Sheet', 'look here gavin');
+    s = readtable(fullfile(dataDir, 'MS.xlsx'), 'Sheet', 'station position');
+    s.lat = (fix(s.lat/1e4) + (s.lat/1e4 - fix(s.lat/1e4))*100/60);
+    s.lon = (fix(s.lon/1e4) + (s.lon/1e4 - fix(s.lon/1e4))*100/60);
+    s.timestamp = datenum([num2str(s.date) num2str(s.time_UTC, '%04d00')], 'yyyymmddHHMMSS');
+    
+    for st = 1:length(s.st_no)
+        if s.st_no(st) == 1634 || s.st_no(st) == 1828
+            lengths = c.(['st' num2str(s.st_no(st))]);
+            lengths = lengths(~isnan(lengths));
+        else
+            lengths = [];
+        end
+    
+        lf(k) = struct('vessel', 'MS', 'station', s.st_no(st), ...
+            'lengths', lengths, ...
+            'lat', s.lat(st), 'lon', s.lon(st), ...
+            'timestamp', s.timestamp(st));
+        k = k + 1;        
+    end
+
+    % Fu Rong Hai
+    disp('Loading Fu Rong Hai data')
+    c = readtable(fullfile(dataDir, 'FRH.xlsx'));
+    s = readtable(fullfile(dataDir,'FRH_station_info.csv'));
+    
+    stations = unique(c.station_num);
+    for i = 1:length(stations)
+        j = find(c.station_num == stations(i));
+        
+        kk = find(strcmp(c.SYNOPTIC_ST(j(1)), s.station));
+        if length(kk) ~= 1
+           warning('No single station info found')
+        end
+        
+        lf(k) = struct('vessel', 'FRH', 'station', c.SYNOPTIC_ST(i), ...
+            'lengths', c.Length(j), ...
+            'lat', s.lat(kk), 'lon', s.lon(kk), ...
+            'timestamp', NaN);
+        k = k + 1;
+    end
+    
+    % Kronprins Haakon
+    % Note. This dataset, obtained from the at-sea plankton database
+    % differs a little from the set that Bjørn prepared for Gavin.
+    disp('Loading Kronprins Haakon data') 
+    c = readtable(fullfile(dataDir, 'KPH_krill_catch_extract.csv'));
+    
+    % fix some column data types
+    c.lon = str2double(c.lon);
+    c.lat = str2double(c.lat);
+    c.len = str2double(c.len);
+    
+    stations = unique(c.serienr);
+    for i = 1:length(stations)
+        j = find(c.serienr == stations(i));
+        
+        % pick out hour and minute of the time
+        h = fix(c.starttid(j(1))/100);
+        m = c.starttid(j(1)) - h*100;
+                
+        lengths = repelem(c.len(j), c.antall(j));
+        lengths = reshape(lengths, [], 1); % force to be a column vector
+        
+        if ~isempty(lengths)
+            lf(k) = struct('vessel', 'KPH', 'station', stations(i), ...
+                'lengths', lengths, ...
+                'lat', c.lat(j(1)), 'lon', c.lon(j(1)), ...
+                'timestamp', datenum(c.aar(j(1)), c.mnd(j(1)), c.dag(j(1)), ...
+                h, m, 0));
+            k = k + 1;
+        end
+    end
+    
+    % Cabo de Hornos
+    % Note. This dataset, obtained from the at-sea plankton database,
+    % differs a lot from the set that Bjørn prepared for Gavin.
+    disp('Loading Cabo de Hornos data')
+    c = readtable(fullfile(dataDir, 'CDH_krill_catch_extract.csv'));
+    
+    % fix some column data types
+    c.lon = str2double(c.lon);
+    c.lat = str2double(c.lat);
+    c.len = str2double(c.len);
+    
+    stations = unique(c.serienr);
+    for i = 1:length(stations)
+        j = find(c.serienr == stations(i));
+        
+        % pick out hour and minute of the time
+        h = fix(c.starttid(j(1))/100);
+        m = c.starttid(j(1)) - h*100;
+                
+        lengths = repelem(c.len(j), c.antall(j));
+        
+        if ~isempty(lengths)
+            lf(k) = struct('vessel', 'CDH', 'station', stations(i), ...
+                'lengths', lengths, ...
+                'lat', c.lat(j(1)), 'lon', c.lon(j(1)), ...
+                'timestamp', datenum(c.aar(j(1)), c.mnd(j(1)), c.dag(j(1)), ...
+                h, m, 0));
+            k = k + 1;
+        end
+    end
+    
+    % Kwang Ja Ho (data not yet received)
+    %disp('Loading Kwang Ja Ho data')
+    
+end
