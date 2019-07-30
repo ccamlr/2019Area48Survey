@@ -1,2 +1,5 @@
 # 2019Area48Survey
-2019 area 48 krill acoustic survey
+
+This repository contains Matlab code to process the data from the International Synoptic Krill Survey in Area 48, 2019. 
+
+The file do_all.m in the src directory lists the scripts to run.
