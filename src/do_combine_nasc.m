@@ -45,23 +45,23 @@ for i = 1:length(vessels)
             % inspection. We use the AMLR stratum names but make up
             % transect numbers (see EMM-11/26)
             transects = {
-                '20190205T102300', '20190205T153100', "ELEPHANT", "02";
-                '20190205T172300', '20190206T083050', "ELEPHANT", "01";
-                '20190206T083726', '20190206T164000', "JOINVILLE", "01";
-                '20190206T192400', '20190207T020500', "JOINVILLE", "02";
-                '20190207T052600', '20190207T101316', "JOINVILLE", "03";
-                '20190207T110955', '20190207T162900', "SOUTH", "01";
-                '20190207T194500', '20190207T234100', "SOUTH", "02";
-                '20190208T025800', '20190208T061900', "SOUTH", "03";
-                '20190208T101200', '20190208T133300', "SOUTH", "04";
-                '20190208T161900', '20190208T203000', "SOUTH", "05";
-                '20190208T231100', '20190209T021800', "SOUTH", "06";
-                '20190209T050200', '20190209T092301', "SOUTH", "07";
-                '20190209T113440', '20190209T153450', "WEST", "07";
-                '20190209T180130', '20190209T221645', "WEST", "06";
-                '20190210T003000', '20190210T054150', "WEST", "05";
-                '20190210T081200', '20190210T135850', "WEST", "04";
-                '20190210T161030', '20190210T211230', "WEST", "03"};
+                '20190205T102300', '20190205T153100', "Elephant", "02";
+                '20190205T172300', '20190206T083050', "Elephant", "01";
+                '20190206T083726', '20190206T164000', "Joinville", "01";
+                '20190206T192400', '20190207T020500', "Joinville", "02";
+                '20190207T052600', '20190207T101316', "Joinville", "03";
+                '20190207T110955', '20190207T162900', "South", "01";
+                '20190207T194500', '20190207T234100', "South", "02";
+                '20190208T025800', '20190208T061900', "South", "03";
+                '20190208T101200', '20190208T133300', "South", "04";
+                '20190208T161900', '20190208T203000', "South", "05";
+                '20190208T231100', '20190209T021800', "South", "06";
+                '20190209T050200', '20190209T092301', "South", "07";
+                '20190209T113440', '20190209T153450', "West", "07";
+                '20190209T180130', '20190209T221645', "West", "06";
+                '20190210T003000', '20190210T054150', "West", "05";
+                '20190210T081200', '20190210T135850', "West", "04";
+                '20190210T161030', '20190210T211230', "West", "03"};
                 
             t = n.Ping_date + timeofday(n.Ping_time);
             for k = 1:size(transects,1)
@@ -99,7 +99,7 @@ for i = 1:length(vessels)
             
             % and change a stratum name for what are the Eastern Scotia Sea
             % transect (which are around the South Sandwich Islands).
-            n.Stratum(n.Stratum == "S_SAND") = "SS"; % Eastern Scotia Sea
+            n.Stratum(n.Stratum == "S_SAND") = "ESS"; % Eastern Scotia Sea
             n.Stratum(n.Stratum == "SAND") = "Sand"; % South Sandwich Islands
             
             % Sort out the transect label for the Sand stratum
@@ -141,10 +141,10 @@ for i = 1:length(vessels)
                 n.Stratum = repmat("AP", size(n.NASC, 1), 1); % Antarctic Pennisula
                 n.Transect = repmat(extractAfter(t,2), size(n.NASC, 1), 1);
             elseif startsWith(t, "ELE") % AMLR stratum
-                n.Stratum = repmat("ELEPHANT", size(n.NASC, 1), 1);
+                n.Stratum = repmat("Elephant", size(n.NASC, 1), 1);
                 n.Transect = repmat(extractAfter(t,3), size(n.NASC, 1), 1);
             elseif startsWith(t, "WEST")  % AMLR stratum
-                n.Stratum = repmat("WEST", size(n.NASC, 1), 1);
+                n.Stratum = repmat("West", size(n.NASC, 1), 1);
                 n.Transect = repmat(extractAfter(t,4), size(n.NASC, 1), 1);
             elseif startsWith(t, "SSI")
                 n.Stratum = repmat("SSI", size(n.NASC, 1), 1);

@@ -1,5 +1,5 @@
 %%
-% Load in krill lengths from trawls and calculate length stats in various
+% Load in krill lengths from trawls and calculate length lf in various
 % ways (by vessel, by strata, by cluster).
 
 baseDir = 'I:\KRILL2019';
@@ -7,38 +7,38 @@ repoDir = '2019Area48SurveyRepo';
 resultsDir = fullfile(baseDir, repoDir, 'results');
 dataDir = fullfile(baseDir, 'data', 'catch');
 
-clear stats
+clear lf
 
 % Load in the krill length data from the various ships
 lf_raw = load_lf_data(dataDir);
 
-% Some stats about the trawls
+% Some lf about the trawls
 vessels = unique({lf_raw.vessel});
 for i = 1:length(vessels)
     j = find(strcmp({lf_raw.vessel}, vessels{i}));
     ll = cat(1,lf_raw(j).lengths);
     
-    stats.vessel(i) = struct('vessel', vessels{i}, ...
+    lf.vessel(i) = struct('vessel', vessels{i}, ...
         'mean', mean(ll), ...
         'std', std(ll), 'min', min(ll), ...
         'max', max(ll), 'numLengths', length(ll), ...
         'numStations', length(j));
 end
 
-% Some stats per station
-stats.station.mean = arrayfun(@(x) mean(x.lengths), lf_raw);
-stats.station.mean_text = cellstr(num2str(stats.station.mean', '%.f'))';
-stats.station.std = arrayfun(@(x) std(x.lengths), lf_raw);
-stats.station.num = arrayfun(@(x) length(x.lengths), lf_raw);
+% Some lf per station
+lf.station.mean = arrayfun(@(x) mean(x.lengths), lf_raw);
+lf.station.mean_text = cellstr(num2str(lf.station.mean', '%.f'))';
+lf.station.std = arrayfun(@(x) std(x.lengths), lf_raw);
+lf.station.num = arrayfun(@(x) length(x.lengths), lf_raw);
 
 % Store the min and max lengths for each station.
-for i = 1:length(stats.station.num)
-    if stats.station.num(i) > 0
-        stats.station.min(i) = min(lf_raw(i).lengths);
-        stats.station.max(i) = max(lf_raw(i).lengths);
+for i = 1:length(lf.station.num)
+    if lf.station.num(i) > 0
+        lf.station.min(i) = min(lf_raw(i).lengths);
+        lf.station.max(i) = max(lf_raw(i).lengths);
     else
-        stats.station.min(i) = NaN;
-        stats.station.max(i) = NaN;
+        lf.station.min(i) = NaN;
+        lf.station.max(i) = NaN;
     end
 end
 
@@ -48,18 +48,18 @@ end
 
 % only do this on trawls with more than minNumKrill krill 
 minNumKrill = 20;
-stationsToUse = find(stats.station.num >= minNumKrill);
-stationsToNotUse = find(stats.station.num < minNumKrill);
+stationsToUse = find(lf.station.num >= minNumKrill);
+stationsToNotUse = find(lf.station.num < minNumKrill);
 
-% update the vessel_stats structure to have how many trawls were used
-for i = 1:length(stats.vessel)
-    stats.vessel(i).numClusteredStations = sum(stats.station.num >= minNumKrill & ...
-        strcmp({lf_raw.vessel}, stats.vessel(i).vessel));
+% update the vessel_lf structure to have how many trawls were used
+for i = 1:length(lf.vessel)
+    lf.vessel(i).numClusteredStations = sum(lf.station.num >= minNumKrill & ...
+        strcmp({lf_raw.vessel}, lf.vessel(i).vessel));
 end
 
 % combine all lf data into a length-binned single matrix.
-min_l = min(stats.station.min(stationsToUse)); % min krill length
-max_l = max(stats.station.max(stationsToUse)); % max krill length
+min_l = min(lf.station.min(stationsToUse)); % min krill length
+max_l = max(lf.station.max(stationsToUse)); % max krill length
 lengths = min_l:1:max_l; % bins
 
 X = zeros(length(lf_raw(stationsToUse)), length(lengths));
@@ -92,14 +92,16 @@ clusters = cluster(Z, 'MaxClust',3);
 % how good was the clustering?
 aggloCoeff = cophenet(Z, D)
 
-% stats per cluster
+% lf per cluster
 for i = 1:length(unique(clusters))
     j = clusters == i;
     ll = cat(1,lf_raw(stationsToUse(j)).lengths);
-    stats.cluster(i) = struct('cluster', ['Cluster ' num2str(i)], ...
+    N = histcounts(ll, lengths);
+    lf.cluster(i) = struct('cluster', ['Cluster ' num2str(i)], ...
         'mean', mean(ll), 'std', std(ll), 'min', min(ll), ...
         'max', max(ll),  'numLengths', length(ll), ...
-        'numStations', sum(j), 'stationIndex', stationsToUse(j));
+        'numStations', sum(j), 'stationIndex', stationsToUse(j), ...
+        'histcounts', N, 'histedges', lengths);
 
 end
 
@@ -109,16 +111,18 @@ end
 % Load survey strata
 strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey strata.geojson')));
 
-% and calculate some stats
+% and calculate some lf
 for i = 1:length(strata.features)
     poly = squeeze(strata.features(i).geometry.coordinates);
     in = inpolygon([lf_raw.lon], [lf_raw.lat], poly(:,1), poly(:,2));
     ll = cat(1, lf_raw(in).lengths);
-    stats.strata(i) = struct('stratum', strata.features(i).properties.stratum, ...
+    N = histcounts(ll, lengths);
+    lf.strata(i) = struct('stratum', strata.features(i).properties.stratum, ...
         'mean', mean(ll), ...
         'std', std(ll), 'min', min(ll), ...
         'max', max(ll),  'numLengths', length(ll), ...
-        'numStations', sum(in));
+        'numStations', sum(in), ...
+        'histcounts', N, 'histedges', lengths);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -126,16 +130,16 @@ end
 
 % Summary of trawls per vessel
 disp('Trawls by vessel:')
-disp(struct2table(stats.vessel))
+disp(struct2table(lf.vessel))
 % Summary of trawls per strata
 disp('Trawls by strata:')
-disp(struct2table(stats.strata))
+disp(struct2table(lf.strata))
 % Summary of trawls per cluster
 disp('Trawls by cluster:')
-disp(struct2table(stats.cluster))
+disp(struct2table(lf.cluster))
 
 % save the results from the processing
-save(fullfile(resultsDir, 'Trawls - data'), 'lf_raw', 'stats', 'aggloCoeff');
+save(fullfile(resultsDir, 'Trawls - data'), 'lf_raw', 'lf', 'aggloCoeff');
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Do some plots
@@ -152,6 +156,7 @@ xlabel('Length (mm)')
 print(fullfile(resultsDir, 'Trawls - cluster lf'), '-dpng','-r300')
 
 figure(2) % Dendrogram of clusters
+clf
 dendrogram(Z)
 print(fullfile(resultsDir, 'Trawls - dendrogram'), '-dpng','-r300')
 

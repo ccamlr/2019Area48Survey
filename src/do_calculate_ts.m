@@ -98,7 +98,8 @@ for i_len = 1:length(ActualLengths)
         'sigma_avg', sigma);
     
     % save each iteration in case of crash
-    save(fullfile(resultsDir, resultsFile), 'results')
+    krill_ts = results;
+    save(fullfile(resultsDir, resultsFile), 'krill_ts')
 
     % update the plot. Doing it this way doesn't give focus to the plot
     set(h, 'XData', [results.ts.ActualLength]*1e3, ...

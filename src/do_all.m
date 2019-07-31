@@ -23,3 +23,10 @@ do_combine_nasc
 % This only needs to be done once - the output is left in the 'results'
 % directory and is used by other code as necessary.
 do_calculate_ts
+
+% Calculate the biomass
+do_estimate_biomass
+% Show the per strata results
+struct2table(biomass.strata)
+% Show the per survey results
+struct2table(biomass.survey)
