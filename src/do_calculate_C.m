@@ -1,10 +1,11 @@
 % calculate the C for conversion of NASC to areal density
 clear all; clf
 
-load clusters123_sizesCCAMLR_1.txt % krill length-frequencies by cluster
+% load krill length-frequencies by cluster
+load clusters123_sizesCCAMLR_1.txt 
 lf=clusters123_sizesCCAMLR_1';
 
-c=1456; % sound speed
+c=1456;                             % sound speed
 freq=[38 120 200]*1e3;              % acoustic frequency
 k=(2*pi.*freq)/c;                   % acoustic wavenumber
 lo=38.35;                           % reference length (mm)
@@ -13,8 +14,9 @@ l=lf(1,:);                          % krill lengths (mm)
 L=l*1e-3;                           % krill lengths (m)
 w=2.236e-3*l.^3.314;                % krill mass (g) (CCAMLR 2000)
 
-
+% load SDWBA TS strengths for krill lengths
 load TS_krill_length_values_alt_fin.mat
+
 % compute and plot SDWBA TS model
 for i=1:size(freq,2),
     kL(i,:)=k(i)*L;
