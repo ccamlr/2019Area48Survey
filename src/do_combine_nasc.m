@@ -114,7 +114,7 @@ for i = 1:length(vessels)
             n.Transect(k) = t;
             
             
-        else 
+        else % data done via the LSSS/Echoview path by IMR
             % Setup the parameters to import the Echoview output files. Echoview
             % doesn't provide a column label for the NASC column, so this mucks up
             % Matlab's automatic importing tools. So set all options explicitly and
@@ -133,10 +133,46 @@ for i = 1:length(vessels)
             % reduce to minimum set of required variables
             n = removevars(n, {'Ping_index', 'Distance_gps', 'Distance_vl', 'Ping_milliseconds', 'Depth_start', 'Depth_stop', 'Range_start', 'Range_stop', 'Sample_count'});
 
+            % Fix an oddity with the export from Echoview where sometimes
+            % there is data beyond the end of the requested time period.
+            % According to plan these time periods should be inside bad (no
+            % data) regions and have NASC values of -9.9e+37, but this
+            % isn't always the case. So we trim the NASC using the on/off
+            % transect timestamps given in the echo-integration
+            % directories.
+            transects = readtable(fullfile(d(j).folder, 'transects.csv'));
+            % transects.csv files have the time with milliseconds and
+            % timezone and readtable returns the time as a character
+            % string, so deal with that (and truncates the milliseconds)
+            transects.Time = datetime(transects.Time, 'InputFormat', 'HH:mm:ss.SSSZ', 'TimeZone', 'UTC');
+            transects.Time.TimeZone = '';
+            transects.Time.Second = floor(transects.Time.Second);
+            
+            % Get the timestamp that is in the echo integral filename
+            parts = split(d(j).name, '_');
+            onTime = datetime(parts{3});
+
+            % Combine transect date and time into a timestamp
+            transects.timestamp = transects.Date + timeofday(transects.Time);
+            
+            % find the on/off lines for the current echo integral .csv file
+            tt = find(transects.timestamp == onTime & startsWith(transects.Event, "On")); 
+            if length(tt) ~= 1
+                tt
+                error('Error in do_combine_nasc')
+            end
+            onTime = transects.timestamp(tt);
+            offTime = transects.timestamp(tt+1);
+            
+            % now trim the nasc based on the on and off time
+            tt = n.Ping_date+timeofday(n.Ping_time);
+            ii = find(tt >= onTime & tt <= offTime);
+            n = n(ii,:);
+
             % add transect and stratum id to the data
             t = split(d(j).name, '_');
             t = string(t{2});
-
+            
             if startsWith(t, "AP")
                 n.Stratum = repmat("AP", size(n.NASC, 1), 1); % Antarctic Pennisula
                 n.Transect = repmat(extractAfter(t,2), size(n.NASC, 1), 1);
@@ -193,7 +229,7 @@ end
 nasc = nasc(nasc.NASC ~= -9.9e37,:);
 % merge the date and time columns into one
 nasc.Ping_timestamp = nasc.Ping_date + timeofday(nasc.Ping_time);
-nasc.Ping_timestamp.Format = 'yyyy-MM-dd hh:mm:ss.SSSS';
+nasc.Ping_timestamp.Format = 'yyyy-MM-dd HH:mm:ss.SSSS';
 nasc = removevars(nasc, {'Ping_date', 'Ping_time'});
 nasc = movevars(nasc, {'Ping_timestamp'}, 'Before', 1);
 
