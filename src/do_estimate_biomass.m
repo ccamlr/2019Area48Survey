@@ -186,7 +186,7 @@ end
 t = struct2table(results.survey);
 t = removevars(t, {'strata'});
 t.Properties.VariableUnits = {'','gm^-2','g^2m^-4','%','t','t^2','%'};
-results.results_survey = t;
+results.biomass_survey = t;
 
 % Follow the contents and arrangement of Table 4 in EMM-11/20
 t = struct2table(results.strata);
@@ -195,7 +195,7 @@ t = movevars(t,'biomass','Before','varianceComponent_stratum');
 t = t([2 1 7 3 4 6 5 9 10 11 8],:); % adhocery... sort rows to match some existing reports
 t.Properties.VariableNames{end} = 'varianceComponent';
 t.Properties.VariableUnits={'' 'km^2' 'gm^-2' 't' 't^2'};
-results.results_strata = t;
+results.biomass_strata = t;
 
 % and save the results
 save(fullfile(resultsDir, 'Final results'), 'results')
