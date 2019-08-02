@@ -1,0 +1,9 @@
+= Overview
+
+This repository contains Matlab code to process the data from the International Synoptic Krill Survey in Area 48, 2019. 
+
+The analysis code is in the `src` directory. 
+
+The `do_all.m` script provides details on how and what to run to carry out the analysis. 
+
+The scripts produce various result files and plots - these are placed into the `results` directory.
