@@ -26,7 +26,12 @@ do_calculate_ts
 
 %% Calculate the biomass
 do_estimate_biomass
+
 % Show the per strata results
-struct2table(biomass.strata)
+disp('Results per strata:')
+disp(biomass.results_strata)
+
 % Show the per survey results
-struct2table(biomass.survey)
+disp('Results per survey:')
+disp(biomass.results_survey)
+
