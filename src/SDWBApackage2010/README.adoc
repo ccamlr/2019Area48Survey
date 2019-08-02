@@ -1,0 +1,17 @@
+= SDWBApackage2010 
+
+This directory contains the code necessary to calculate krill target strength based on the Stochastic Distorted-Wave Born Approximation model parameterized by body digitization.
+
+It is an extract of relevant files from version 1.1 (June 2012) of the SDWBApackage2010 software.
+
+These files have been slightly modified to allow for running the software programmatically from other Matlab code, rather than from the GUI (as provided by the SDWBApackage2010)
+
+For further details on this package, refer to:
+
+https://www.ccamlr.org/en/publications/science_journal/ccamlr-science-volume-18/97-112[Calise, L., and Skaret, G. 2011. Sensitivity investigation of the SDWBA Antarctic krill target strength model to fatness, material contrasts and orientation. CCAMLR Science, 18: 97–122.]
+
+The SDWBApackagea2010 itself can be https://www.ccamlr.org/en/data/analytical-tools[requested] from CCAMLR.
+
+
+
+
