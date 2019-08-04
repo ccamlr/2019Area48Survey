@@ -29,9 +29,9 @@ do_estimate_biomass
 
 % Show the per strata results
 disp('Results per strata:')
-disp(biomass.results_strata)
+disp(results.biomass_strata)
 
 % Show the per survey results
 disp('Results per survey:')
-disp(biomass.results_survey)
+disp(results.biomass_survey)
 
