@@ -14,7 +14,7 @@ resultsDir = fullfile(baseDir, repoDir, 'results');
 % Units are km^2
 s = {'AP', 473318; 'SS' 1109789; 'ESS', 321800; ...
     'SSI', 48654; 'SOI', 24409; 'SG', 25000; 'Sand', 62274; ...
-    'Joinville', 18151; 'Elephant', 43865; 'West', 38524; 'South', 24479};
+    'Joinville', 18151; 'Elephant', 43865; 'West', 38524; 'Bransfield', 24479};
 % and turn this into a more useful structure
 strata_area(size(s,1)) = struct('name',[], 'area', []);
 for i = 1:size(s,1)
@@ -138,7 +138,7 @@ results.survey(1).name = 'Area 48 2019';
 results.survey(1).strata = ["AP", "SS", "SSI", "SOI", "Sand", "ESS"];
 
 results.survey(2).name = 'AMLR 2019';
-results.survey(2).strata = ["Joinville", "Elephant", "West", "South"];
+results.survey(2).strata = ["Joinville", "Elephant", "West", "Bransfield"];
 
 for s = 1:length(results.survey)
     % identify which strata are in this survey
