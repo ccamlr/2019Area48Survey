@@ -158,7 +158,7 @@ clf
 for k = 1:2
     subplot(1,2,k)
 
-    plot_standard_map(strata)
+    plot_standard_map(strata, 'showStrataNames', false)
     m_plot([ctd.lon],[ctd.lat], 'k.')
         
     % A contour plot of sound speed over the survey area
@@ -176,12 +176,12 @@ for k = 1:2
     clabel(cs, h, 'fontsize', 9);
     
     m_grid('box', 'on')
-    title(contourText)
+    %title(contourText)
 end
 
-% save the results
 print(fullfile(resultsDir, 'CTD - station map'), '-dpng','-r300')
 
+% save the results
 save(fullfile(resultsDir, 'CTD - data'), 'ctd', 'results', 'uniform')
 
 
