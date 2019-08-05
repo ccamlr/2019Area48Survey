@@ -197,8 +197,8 @@ function ctd = load_ctd_data(dataDir)
 
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % Load in DY data
-    disp('Loading RSS Discovery data')
-    d = dir(fullfile(dataDir, 'RSS', '*.mat'));
+    disp('Loading RRS Discovery data')
+    d = dir(fullfile(dataDir, 'RRS', '*.mat'));
 
     for i = 1:length(d)
         c = load(fullfile(d(i).folder, d(i).name));

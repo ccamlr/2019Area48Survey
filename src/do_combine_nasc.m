@@ -8,7 +8,7 @@ repoDir = '2019Area48SurveyRepo';
 dataDir = fullfile(baseDir, 'data', 'echo-integration');
 resultsDir = fullfile(baseDir, repoDir, 'results');
 
-vessels = {'CDH' 'KJH' 'KPH' 'MS' 'FRH' 'RSS'};
+vessels = {'CDH' 'KJH' 'KPH' 'MS' 'FRH' 'RRS'};
 
 nasc = table([]);
 for i = 1:length(vessels)
