@@ -73,47 +73,6 @@ for i = 1:length(vessels)
             % on a transect, so remove it
             k = ~ismissing(n.Transect);
             n = n(k,:);
-            
-        elseif strcmp(vessels{i}, 'RSS') % has some extra columns compared to the other vessels
-            opts = delimitedTextImportOptions("NumVariables", 18);
-            
-            % Specify range and delimiter
-            opts.DataLines = [2, Inf];
-            opts.Delimiter = ",";
-            
-            % Specify column names and types
-            opts.VariableNames = ["Ping_index", "Distance_gps", "Distance_vl", "Ping_date", "Ping_time", "Ping_milliseconds", "Latitude", "Longitude", "Depth_start", "Depth_stop", "Range_start", "Range_stop", "Sample_count", "NASC", "Vessel", "Clock", "Transect", "Stratum"];
-            opts.VariableTypes = ["double", "double", "double", "datetime", "datetime", "double", "double", "double", "double", "double", "double", "double", "double", "double", "string", "datetime", "string", "string"];
-            
-            opts = setvaropts(opts, 4, "InputFormat", "yyyy-MM-dd");
-            opts = setvaropts(opts, 5, "InputFormat", "HH:mm:ss");
-            opts = setvaropts(opts, 16, "InputFormat", "yyyy-MM-dd HH:mm:ss");
-            opts = setvaropts(opts, [15, 18], "EmptyFieldRule", "auto");
-            opts.ExtraColumnsRule = "ignore";
-            opts.EmptyLineRule = "read";
-            
-            n = readtable(fullfile(d(j).folder, d(j).name), opts);
-            
-            % reduce to minimum set of required variables
-            n = removevars(n, {'Ping_index', 'Distance_gps', 'Distance_vl', 'Ping_milliseconds', 'Depth_start', 'Depth_stop', 'Range_start', 'Range_stop', 'Sample_count', 'Clock'});
-            
-            % and change a stratum name for what are the Eastern Scotia Sea
-            % transect (which are around the South Sandwich Islands).
-            n.Stratum(n.Stratum == "S_SAND") = "ESS"; % Eastern Scotia Sea
-            n.Stratum(n.Stratum == "SAND") = "Sand"; % South Sandwich Islands
-            
-            % Sort out the transect label for the Sand stratum
-            k = find(strcmp(n.Stratum, "Sand"));
-            t = extractAfter(n.Transect(k), 4);
-            t(strlength(t) == 1) = "0" + t(strlength(t) == 1);
-            n.Transect(k) = t;
-            
-            % and for the ESS stratum
-            k = find(strcmp(n.Stratum, "SS"));
-            t = extractAfter(n.Transect(k), 2);
-            n.Transect(k) = t;
-            
-            
         else % data done via the LSSS/Echoview path by IMR
             % Setup the parameters to import the Echoview output files. Echoview
             % doesn't provide a column label for the NASC column, so this mucks up
@@ -133,42 +92,41 @@ for i = 1:length(vessels)
             % reduce to minimum set of required variables
             n = removevars(n, {'Ping_index', 'Distance_gps', 'Distance_vl', 'Ping_milliseconds', 'Depth_start', 'Depth_stop', 'Range_start', 'Range_stop', 'Sample_count'});
 
-            % Fix an oddity with the export from Echoview where sometimes
-            % there is data beyond the end of the requested time period.
-            % According to plan these time periods should be inside bad (no
-            % data) regions and have NASC values of -9.9e+37, but this
-            % isn't always the case. So we trim the NASC using the on/off
-            % transect timestamps given in the echo-integration
-            % directories.
-            transects = readtable(fullfile(d(j).folder, 'transects.csv'));
-            % transects.csv files have the time with milliseconds and
-            % timezone and readtable returns the time as a character
-            % string, so deal with that (and truncates the milliseconds)
-            transects.Time = datetime(transects.Time, 'InputFormat', 'HH:mm:ss.SSSZ', 'TimeZone', 'UTC');
-            transects.Time.TimeZone = '';
-            transects.Time.Second = floor(transects.Time.Second);
-            
-            % Get the timestamp that is in the echo integral filename
-            parts = split(d(j).name, '_');
-            onTime = datetime(parts{3});
-
-            % Combine transect date and time into a timestamp
-            transects.timestamp = transects.Date + timeofday(transects.Time);
-            
-            % find the on/off lines for the current echo integral .csv file
-            tt = find(transects.timestamp == onTime & startsWith(transects.Event, "On")); 
-            if length(tt) ~= 1
-                tt
-                error('Error in do_combine_nasc')
+            % Trim the NASC using the on/off transect timestamps given in
+            % the echo-integration directories to ensure that we don't get
+            % unwanted integration data. 
+            % only do this if there is a 'transects.csv' file
+            if exist(fullfile(d(j).folder, 'transects.csv'), 'file')
+                transects = readtable(fullfile(d(j).folder, 'transects.csv'));
+                % transects.csv files have the time with milliseconds and
+                % timezone and readtable returns the time as a character
+                % string, so deal with that (and truncates the milliseconds)
+                transects.Time = datetime(transects.Time, 'InputFormat', 'HH:mm:ss.SSSZ', 'TimeZone', 'UTC');
+                transects.Time.TimeZone = '';
+                transects.Time.Second = floor(transects.Time.Second);
+                
+                % Get the timestamp that is in the echo integral filename
+                parts = split(d(j).name, '_');
+                onTime = datetime(parts{3});
+                
+                % Combine transect date and time into a timestamp
+                transects.timestamp = transects.Date + timeofday(transects.Time);
+                
+                % find the on/off lines for the current echo integral .csv file
+                tt = find(transects.timestamp == onTime & startsWith(transects.Event, "On"));
+                if length(tt) ~= 1
+                    tt
+                    error('Error in do_combine_nasc')
+                end
+                onTime = transects.timestamp(tt);
+                offTime = transects.timestamp(tt+1);
+                
+                % now trim the nasc based on the on and off time
+                tt = n.Ping_date+timeofday(n.Ping_time);
+                ii = find(tt >= onTime & tt <= offTime);
+                n = n(ii,:);
             end
-            onTime = transects.timestamp(tt);
-            offTime = transects.timestamp(tt+1);
             
-            % now trim the nasc based on the on and off time
-            tt = n.Ping_date+timeofday(n.Ping_time);
-            ii = find(tt >= onTime & tt <= offTime);
-            n = n(ii,:);
-
             % add transect and stratum id to the data
             t = split(d(j).name, '_');
             t = string(t{2});
@@ -185,6 +143,9 @@ for i = 1:length(vessels)
             elseif startsWith(t, "SSI")
                 n.Stratum = repmat("SSI", size(n.NASC, 1), 1);
                 n.Transect = repmat(extractAfter(t,3), size(n.NASC, 1), 1);
+            elseif startsWith(t, "SSA") || startsWith(t, "SSB") || startsWith(t, "SSC")
+                n.Stratum = repmat("ESS", size(n.NASC, 1), 1);
+                n.Transect = repmat(extractAfter(t,2), size(n.NASC, 1), 1);
             elseif startsWith(t, "SS") % Scotia Sea. Must come after SSI
                 n.Stratum = repmat("SS", size(n.NASC, 1), 1);
                 n.Transect = repmat(extractAfter(t,2), size(n.NASC, 1), 1);
@@ -203,6 +164,9 @@ for i = 1:length(vessels)
             elseif startsWith(t, "SA483")
                 n.Stratum = repmat("SA483", size(n.NASC, 1), 1);
                 n.Transect = repmat(extractAfter(t,6), size(n.NASC, 1), 1);
+            elseif startsWith(t, "Sand")
+                n.Stratum = repmat("Sand", size(n.NASC, 1), 1);
+                n.Transect = repmat(extractAfter(t,4), size(n.NASC, 1), 1);
             else
                 n.Stratum = repmat("Unknown", size(n.NASC, 1), 1);
                 n.Transect = repmat("Unknown", size(n.NASC, 1), 1);
