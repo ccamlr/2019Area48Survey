@@ -74,7 +74,6 @@ end
 
 % Do the hierarchical clustering.
 
-% TODO:
 % log2 transform (log2(a+1) a = number of individuals in a length class,
 % center on a zero mean, and standarise to unit variance
 Xd = log2(X+1);
@@ -192,7 +191,8 @@ function lf = load_lf_data(dataDir)
     % Am only interested in the length-frequencies, so will reduce the
     % datasets to this if not already...
 
-    k = 1;
+    lf = struct('vessel', [], 'station', [], 'lengths', [], ...
+        'lat', [], 'lon', [], 'timestamp', [], 'type', []);
     
     % RRS Discovery
     disp('Loading RRS Discovery data')
@@ -200,6 +200,7 @@ function lf = load_lf_data(dataDir)
     s = readtable(fullfile(dataDir, 'RRS_station_info.csv'));
 
     stations = unique(c.Event_number);
+    k = length(lf);
     for i = 1:length(stations)
         j = c.Event_number == stations(i);
         
@@ -211,7 +212,8 @@ function lf = load_lf_data(dataDir)
         lf(k) = struct('vessel', 'RSS', 'station', stations(i), ...
             'lengths', c.Length(j), ...
             'lat', s.Latitude(kk), 'lon', s.Longitude(kk), ...
-            'timestamp', datenum(s.timestamp(kk)));
+            'timestamp', datenum(s.timestamp(kk)), ...
+            'type', 'STN');
         k = k + 1;
     end
     
@@ -223,6 +225,7 @@ function lf = load_lf_data(dataDir)
     s.lon = (fix(s.lon/1e4) + (s.lon/1e4 - fix(s.lon/1e4))*100/60);
     s.timestamp = datenum([num2str(s.date) num2str(s.time_UTC, '%04d00')], 'yyyymmddHHMMSS');
     
+    k = length(lf) + 1;
     for st = 1:length(s.st_no)
         if s.st_no(st) == 1634 || s.st_no(st) == 1828
             lengths = c.(['st' num2str(s.st_no(st))]);
@@ -234,7 +237,8 @@ function lf = load_lf_data(dataDir)
         lf(k) = struct('vessel', 'MS', 'station', s.st_no(st), ...
             'lengths', lengths, ...
             'lat', s.lat(st), 'lon', s.lon(st), ...
-            'timestamp', s.timestamp(st));
+            'timestamp', s.timestamp(st), ...
+             'type', 'STN');
         k = k + 1;        
     end
 
@@ -244,6 +248,7 @@ function lf = load_lf_data(dataDir)
     s = readtable(fullfile(dataDir,'FRH_station_info.csv'));
     
     stations = unique(c.station_num);
+    k = length(lf) + 1;
     for i = 1:length(stations)
         j = find(c.station_num == stations(i));
         
@@ -255,7 +260,8 @@ function lf = load_lf_data(dataDir)
         lf(k) = struct('vessel', 'FRH', 'station', c.SYNOPTIC_ST(i), ...
             'lengths', c.Length(j), ...
             'lat', s.lat(kk), 'lon', s.lon(kk), ...
-            'timestamp', NaN);
+            'timestamp', NaN, ...
+             'type', 'STN');
         k = k + 1;
     end
     
@@ -271,6 +277,7 @@ function lf = load_lf_data(dataDir)
     c.len = str2double(c.len);
     
     stations = unique(c.serienr);
+    k = length(lf) + 1;
     for i = 1:length(stations)
         j = find(c.serienr == stations(i));
         
@@ -286,7 +293,7 @@ function lf = load_lf_data(dataDir)
                 'lengths', lengths, ...
                 'lat', c.lat(j(1)), 'lon', c.lon(j(1)), ...
                 'timestamp', datenum(c.aar(j(1)), c.mnd(j(1)), c.dag(j(1)), ...
-                h, m, 0));
+                h, m, 0),  'type', 'STN');
             k = k + 1;
         end
     end
@@ -303,6 +310,7 @@ function lf = load_lf_data(dataDir)
     c.len = str2double(c.len);
     
     stations = unique(c.serienr);
+    k = length(lf) + 1;
     for i = 1:length(stations)
         j = find(c.serienr == stations(i));
         
@@ -317,12 +325,56 @@ function lf = load_lf_data(dataDir)
                 'lengths', lengths, ...
                 'lat', c.lat(j(1)), 'lon', c.lon(j(1)), ...
                 'timestamp', datenum(c.aar(j(1)), c.mnd(j(1)), c.dag(j(1)), ...
-                h, m, 0));
+                h, m, 0),  'type', 'STN');
             k = k + 1;
         end
     end
     
     % Kwang Ja Ho (data not yet received)
-    %disp('Loading Kwang Ja Ho data')
+    disp('Loading Kwang Ja Ho data')
+    
+    c = readtable(fullfile(dataDir, 'KJH.xlsx'), 'Sheet', 'Krill length frequency data');
+    s = readtable(fullfile(dataDir, 'KJH_station_info.csv'));
+    
+    % remove the entries that are thought to be ice krill, not Antarctic
+    % krill
+    i = ~strcmp(c.comments, 'ice');
+    c = c(i,:);
+    
+    % correct some inconsistencies in the station names so they match those
+    % in the s table.
+    i = strcmp(c.station, '05.05-08(158)');
+    c.station(i) = {'05.5-08(158)'};
+    % and trim off the station number in the c table, leaving just the AMLR station name
+    c.station = cellfun(@(S) S(1:end-5), c.station, 'UniformOutput', false);
+    % trim off trailing spaces...
+    c.station = strtrim(c.station);
+    % the hyphen is not a hyphen in the data from the
+    % spreadsheet (probably due to the Korean coding of the spreadsheet
+    % file), so fix that.
+    c.station = regexprep(c.station, '\xAD', '-');
+    
+    stations = unique(c.station);
+    k = length(lf) + 1;
+    for i = 1:length(stations)
+        j = strcmp(c.station, stations(i));
+        
+        % Find the matching station in the s table (to get lat/lon)
+        kk = find(strcmp(s.station, stations(i)));
+        if length(kk) ~= 1
+            warning(['No info found for station ' stations{i}])
+        end
+        
+        lengths = c.length_mm_(j);
+        
+        if ~isempty(lengths)
+            lf(k) = struct('vessel', 'KJH', 'station', stations(i), ...
+                'lengths', lengths, ...
+                'lat', s.lat(kk), 'lon', s.lon(kk), ...
+                'timestamp', datenum(2019, 3, 8, 0, 0, 0), ...
+                'type', s.type(kk));
+            k = k + 1;
+        end
+    end
     
 end
