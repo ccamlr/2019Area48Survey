@@ -160,6 +160,7 @@ writetable(tor, fullfile(resultsDir, 'Trawls - for Tor.csv'), ...
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Do some plots
 
+%%%%%%%%%%%%%%%%%%%%%%
 figure(1) % Cluster lfs
 clf
 for i = 1:length(unique(clusters))
@@ -171,12 +172,15 @@ end
 xlabel('Length (mm)')
 print(fullfile(resultsDir, 'Trawls - cluster lf'), '-dpng','-r300')
 
+%%%%%%%%%%%%%%%%%%%%%%%
 figure(2) % Dendrogram of clusters
 clf
 dendrogram(Z)
 print(fullfile(resultsDir, 'Trawls - dendrogram'), '-dpng','-r300')
 
+%%%%%%%%%%%%%%%%%%%%%%
 figure(3) % Map of stations, clusters, and strata
+clf
 plot_standard_map(strata)
 
 % plot the station positions
@@ -202,6 +206,23 @@ h = legend(h, labels, 'Location', 'southeast');
 title(h, 'Clusters')
 
 print(fullfile(resultsDir, 'Trawls - map'), '-dpng','-r300')
+
+%%%%%%%%%%%%%%%%
+figure(4) % LF's per strata
+clf
+for i = 1:length(lf.strata)
+    subplot(4,3,i)
+    lf.strata(i).histedges
+    histogram('BinEdges', lf.strata(i).histedges, ...
+        'BinCounts', lf.strata(i).histcounts)
+    textLoc(lf.strata(i).stratum, 'NorthWest')
+    if i >= 9
+        xlabel('Length (mm)')
+    end
+end
+
+print(fullfile(resultsDir, 'Trawls - lf per stratum'), '-dpng', '-r300')
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function lf = load_lf_data(dataDir)
