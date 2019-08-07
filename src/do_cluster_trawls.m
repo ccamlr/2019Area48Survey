@@ -72,6 +72,18 @@ for i = 1:length(lf_raw(stationsToUse))
     end
 end
 
+% Make up a table that suits Tor Knutsen's R code for clustering. This iwll
+% be written to a file later on.
+tor = array2table(X');
+% and sort out the row and column names
+for i = 1:length(stationsToUse)
+    sName = matlab.lang.makeValidName(num2str(lf_raw(stationsToUse(i)).station));
+    tor.Properties.VariableNames{i} = [lf_raw(stationsToUse(i)).vessel sName];
+end
+for i = 1:length(lengths)
+    tor.Properties.RowNames{i} = ['S' num2str(lengths(i))];
+end
+
 % Do the hierarchical clustering.
 
 % log2 transform (log2(a+1) a = number of individuals in a length class,
@@ -139,6 +151,11 @@ disp(struct2table(lf.cluster))
 
 % save the results from the processing
 save(fullfile(resultsDir, 'Trawls - data'), 'lf_raw', 'lf', 'aggloCoeff');
+
+% save the results in a form that Tor Knutsen can easily use for his
+% clustering R code
+writetable(tor, fullfile(resultsDir, 'Trawls - for Tor.csv'), ...
+    'FileType', 'text', 'WriteRowNames', true);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Do some plots
@@ -257,7 +274,7 @@ function lf = load_lf_data(dataDir)
            warning('No single station info found')
         end
         
-        lf(k) = struct('vessel', 'FRH', 'station', c.SYNOPTIC_ST(i), ...
+        lf(k) = struct('vessel', 'FRH', 'station', c.SYNOPTIC_ST(j(1)), ...
             'lengths', c.Length(j), ...
             'lat', s.lat(kk), 'lon', s.lon(kk), ...
             'timestamp', NaN, ...
