@@ -225,7 +225,8 @@ legend(h, v, 'Location', 'SouthEast')
 
 print(fullfile(resultsDir, 'NASC - by vessel'), '-dpng','-r300')
 
-% Map coloured by stratum
+% Map coloured by stratum. Do several, based on different areas
+% Entire area. Too crowded to be really useful...
 figure(2)
 clf
 plot_standard_map(strata)
@@ -245,9 +246,71 @@ legend(h, s, 'Location', 'SouthEast', 'NumColumns', 2, 'Interpreter', 'none')
 
 print(fullfile(resultsDir, 'NASC - by stratum'), '-dpng','-r300')
 
+%%%%%%%%%%%
+figure(3)
+clf
+
+s = ["Bransfield" "Elephant" "Joinville" "West"];
+plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
+    'strata', s, 'showStrataNames', false, ...
+    'coastDetail', 'high')
+maxNASC = max(nasc.NASC);
+
+h = [];
+for i = 1:length(s)
+    j = find(nasc.Stratum == s(i));
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', 'o');
+end
+
+m_grid('box', 'on')
+legend(h, s, 'Location', 'SouthEast')
+
+print(fullfile(resultsDir, 'NASC - AMLR'), '-dpng','-r300')
+
+%%%%%%%%%%%
+figure(4)
+clf
+
+s = ["ESS" "Sand" "SG" "SS" "AP"];
+plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
+    'strata', s, 'showStrataNames', false, ...
+    'coastDetail', 'intermediate')
+maxNASC = max(nasc.NASC);
+
+h = [];
+for i = 1:length(s)
+    j = find(nasc.Stratum == s(i));
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', 'o');
+end
+
+m_grid('box', 'on')
+legend(h, s, 'Location', 'SouthEast')
+
+print(fullfile(resultsDir, 'NASC - CCAMLR 2000'), '-dpng','-r300')
+
+%%%%%%%%%%%
+figure(5)
+clf
+
+s = ["SOI" "SOC" "SOF"];
+plot_standard_map(strata, 'centrePoint', [-45 -61], 'radius', 2.5, ...
+    'strata', s, 'showStrataNames', false, ...
+    'coastDetail', 'fine')
+maxNASC = max(nasc.NASC);
+
+h = [];
+for i = 1:length(s)
+    j = find(nasc.Stratum == s(i));
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', 'o');
+end
+
+m_grid('box', 'on')
+legend(h, s, 'Location', 'SouthEast')
+
+print(fullfile(resultsDir, 'NASC - South Orkney'), '-dpng','-r300')
 
 % Map of transect data and their names
-figure(3)
+figure(6)
 clf
 plot_standard_map(strata)
 
