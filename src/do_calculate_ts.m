@@ -15,7 +15,7 @@ resultsFile = 'SDWBA-TS-2019';
 addpath(SDWBAdir)
 
 % Key parameters
-ActualLengths = (10:65)*1e-3; % [m]
+ActualLengths = (10:67)*1e-3; % [m]
 h0 = 1.0279; % sound speed contrast
 g0 = 1.0357; % density contrast
 c = 1456; % sound speed [m/s]
