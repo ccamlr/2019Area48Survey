@@ -334,6 +334,7 @@ function lf = load_lf_data(dataDir)
     disp('Loading Kwang Ja Ho data')
     
     c = readtable(fullfile(dataDir, 'KJH.xlsx'), 'Sheet', 'Krill length frequency data');
+    st = readtable(fullfile(dataDir, 'KJH.xlsx'), 'Sheet', 'Catch');
     s = readtable(fullfile(dataDir, 'KJH_station_info.csv'));
     
     % remove the entries that are thought to be ice krill, not Antarctic
@@ -353,11 +354,16 @@ function lf = load_lf_data(dataDir)
     % spreadsheet (probably due to the Korean coding of the spreadsheet
     % file), so fix that.
     c.station = regexprep(c.station, '\xAD', '-');
+    st.Station = regexprep(st.Station, '\xAD', '-');
+    
+    % make a datetime from the separate fields in the st table
+    st.startTimestamp = datetime(num2str(st.Date), 'InputFormat', 'yyyyMMdd') + days(st.StartTime);
+    st.stopTimestamp = datetime(num2str(st.Date), 'InputFormat', 'yyyyMMdd') + days(st.EndTime);
     
     stations = unique(c.station);
     k = length(lf) + 1;
     for i = 1:length(stations)
-        j = strcmp(c.station, stations(i));
+        j = strcmpi(c.station, stations(i));
         
         % Find the matching station in the s table (to get lat/lon)
         kk = find(strcmp(s.station, stations(i)));
@@ -365,13 +371,17 @@ function lf = load_lf_data(dataDir)
             warning(['No info found for station ' stations{i}])
         end
         
+        % Find the matching station in the st table (to get start/stop
+        % times)
+        jj = strcmpi(st.Station, stations(i));
+
         lengths = c.length_mm_(j);
         
         if ~isempty(lengths)
             lf(k) = struct('vessel', 'KJH', 'station', stations(i), ...
                 'lengths', lengths, ...
                 'lat', s.lat(kk), 'lon', s.lon(kk), ...
-                'timestamp', datenum(2019, 3, 8, 0, 0, 0), ...
+                'timestamp', datenum(st.startTimestamp(jj)), ...
                 'type', s.type(kk));
             k = k + 1;
         end
