@@ -10,7 +10,10 @@ resultsDir = fullfile(baseDir, repoDir, 'results');
 % ** Should be calculated directly from the latest strata boundaries **
 
 % CCAMLR 2000 strata areas from Bo workshop 2004, section 2.3
-% AMLR strata areas from Figure 1 of EMM-11/26. 
+% AMLR strata areas from Figure 1 of EMM-11/26 and confirmed via email from
+% Christian Reiss. He notes that for Joinville they tend not to report
+% biomass (only density) as their survey coverage is quite variable from year to year. 
+
 % Units are km^2
 s = {'AP', 473318; 'SS' 1109789; 'ESS', 321800; ...
     'SSI', 48654; 'SOI', 24409; 'SG', 25000; 'Sand', 62274; ...
