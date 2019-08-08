@@ -206,15 +206,24 @@ title(h, 'Clusters')
 print(fullfile(resultsDir, 'Trawls - map'), '-dpng','-r300')
 
 %%%%%%%%%%%%%%%%
-figure(4) % LF's per strata
+figure(4) % All the lf's
 clf
 for i = 1:length(lf.strata)
     subplot(4,4,i)
-    lf.strata(i).histedges
     histogram('BinEdges', lf.strata(i).histedges, ...
         'BinCounts', lf.strata(i).histcounts)
-    textLoc(lf.strata(i).stratum, 'NorthWest')
-    if i >= 9
+    textLoc(lf.strata(i).stratum, 'NorthWest');
+    if i >= 13
+        xlabel('Length (mm)')
+    end
+end
+for i = 1:length(lf.cluster)
+    j = length(lf.strata) + i;
+    subplot(4,4,j)
+    histogram('BinEdges', lf.cluster(i).histedges, ...
+        'BinCounts', lf.cluster(i).histcounts)
+    textLoc(lf.cluster(i).cluster, 'NorthWest');
+    if j >= 13
         xlabel('Length (mm)')
     end
 end
