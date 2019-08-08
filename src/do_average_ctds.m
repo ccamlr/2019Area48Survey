@@ -159,7 +159,7 @@ for k = 1:2
     subplot(1,2,k)
 
     plot_standard_map(strata, 'showStrataNames', false)
-    m_plot([ctd.lon],[ctd.lat], 'k.')
+    m_plot([ctd.lon],[ctd.lat], '.', 'color', [0.5 0.5 0.5])
         
     % A contour plot of sound speed over the survey area
     if k == 1
