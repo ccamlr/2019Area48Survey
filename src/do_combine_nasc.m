@@ -204,129 +204,130 @@ save(fullfile(resultsDir, 'NASC - data'), 'nasc')
 %%%%%%%%%%%%%%%%
 % Maps
 
-strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey strata.geojson')));
-
-% Map coloured by vessel
-figure(1)
-clf
-plot_standard_map(strata)
-
-% Use a different colour for each vessel
-maxNASC = max(nasc.NASC);
-v = unique(nasc.Vessel);
-h = nan(length(v), 1);
-for i = 1:length(v)
-    j = find(nasc.Vessel == v(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled');
+if false % these plots have been moved to showing rho, and are now down in the do_estimate_biomass.m script. 
+    strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey strata.geojson')));
+    
+    % Map coloured by vessel
+    figure(1)
+    clf
+    plot_standard_map(strata)
+    
+    % Use a different colour for each vessel
+    maxNASC = max(nasc.NASC);
+    v = unique(nasc.Vessel);
+    h = nan(length(v), 1);
+    for i = 1:length(v)
+        j = find(nasc.Vessel == v(i));
+        h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled');
+    end
+    
+    m_grid('box', 'on')
+    legend(h, v, 'Location', 'SouthEast')
+    
+    print(fullfile(resultsDir, 'NASC - by vessel'), '-dpng','-r300')
+    
+    % Map coloured by stratum. Do several, based on different areas
+    % Entire area. Too crowded to be really useful...
+    figure(2)
+    clf
+    plot_standard_map(strata)
+    
+    % Use a different colour and symbol for each statum
+    maxNASC = max(nasc.NASC);
+    s = unique(nasc.Stratum);
+    symbols = {'o' 'o' 'o' 'o' 'o' 'o' 'o' 'd' 'd' 'd' 'd' 'd' 'd' 'd'};
+    h = [];
+    for i = 1:length(s)
+        j = find(nasc.Stratum == s(i));
+        h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', symbols{i});
+    end
+    
+    m_grid('box', 'on')
+    legend(h, s, 'Location', 'SouthEast', 'NumColumns', 2, 'Interpreter', 'none')
+    
+    print(fullfile(resultsDir, 'NASC - by stratum'), '-dpng','-r300')
+    
+    %%%%%%%%%%%
+    figure(3)
+    clf
+    
+    s = ["Bransfield" "Elephant" "Joinville" "West"];
+    plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
+        'strata', s, 'showStrataNames', false, ...
+        'coastDetail', 'high')
+    maxNASC = max(nasc.NASC);
+    
+    h = [];
+    for i = 1:length(s)
+        j = find(nasc.Stratum == s(i));
+        h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', 'o');
+    end
+    
+    m_grid('box', 'on')
+    legend(h, s, 'Location', 'SouthEast')
+    
+    print(fullfile(resultsDir, 'NASC - AMLR'), '-dpng','-r300')
+    
+    %%%%%%%%%%%
+    figure(4)
+    clf
+    
+    s = ["ESS" "Sand" "SG" "SS" "AP" "SSI"];
+    plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
+        'strata', s, 'showStrataNames', false, ...
+        'coastDetail', 'intermediate')
+    maxNASC = max(nasc.NASC);
+    
+    h = [];
+    for i = 1:length(s)
+        j = find(nasc.Stratum == s(i));
+        h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', 'o');
+    end
+    
+    m_grid('box', 'on')
+    legend(h, s, 'Location', 'SouthEast')
+    
+    print(fullfile(resultsDir, 'NASC - CCAMLR 2000'), '-dpng','-r300')
+    
+    %%%%%%%%%%%
+    figure(5)
+    clf
+    
+    s = ["SOI" "SOC" "SOF"];
+    plot_standard_map(strata, 'centrePoint', [-45 -61], 'radius', 2.5, ...
+        'strata', s, 'showStrataNames', false, ...
+        'coastDetail', 'fine')
+    maxNASC = max(nasc.NASC);
+    
+    h = [];
+    for i = 1:length(s)
+        j = find(nasc.Stratum == s(i));
+        h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', 'o');
+    end
+    
+    m_grid('box', 'on')
+    legend(h, s, 'Location', 'SouthEast')
+    
+    print(fullfile(resultsDir, 'NASC - South Orkney'), '-dpng','-r300')
+    
+    % Map of transect data and their names
+    figure(6)
+    clf
+    plot_standard_map(strata)
+    
+    transects = unique(nasc.Stratum + nasc.Transect);
+    
+    for i = 1:length(transects)
+        k = find(nasc.Stratum+nasc.Transect == transects(i));
+        m_plot(nasc.Longitude(k), nasc.Latitude(k), 'k.');
+        hold on
+        % and a label at the northernmost part
+        [~, n_i] = max(nasc.Latitude(k));
+        m_text(nasc.Longitude(k(n_i)), nasc.Latitude(k(n_i)), transects(i))
+    end
+    
+    m_grid('box', 'on')
+    
+    print(fullfile(resultsDir, 'Transects - as done and labelled'), '-dpng','-r300')
 end
-
-m_grid('box', 'on')
-legend(h, v, 'Location', 'SouthEast')
-
-print(fullfile(resultsDir, 'NASC - by vessel'), '-dpng','-r300')
-
-% Map coloured by stratum. Do several, based on different areas
-% Entire area. Too crowded to be really useful...
-figure(2)
-clf
-plot_standard_map(strata)
-
-% Use a different colour and symbol for each statum
-maxNASC = max(nasc.NASC);
-s = unique(nasc.Stratum);
-symbols = {'o' 'o' 'o' 'o' 'o' 'o' 'o' 'd' 'd' 'd' 'd' 'd' 'd' 'd'};
-h = [];
-for i = 1:length(s)
-    j = find(nasc.Stratum == s(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', symbols{i});
-end
-
-m_grid('box', 'on')
-legend(h, s, 'Location', 'SouthEast', 'NumColumns', 2, 'Interpreter', 'none')
-
-print(fullfile(resultsDir, 'NASC - by stratum'), '-dpng','-r300')
-
-%%%%%%%%%%%
-figure(3)
-clf
-
-s = ["Bransfield" "Elephant" "Joinville" "West"];
-plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
-    'strata', s, 'showStrataNames', false, ...
-    'coastDetail', 'high')
-maxNASC = max(nasc.NASC);
-
-h = [];
-for i = 1:length(s)
-    j = find(nasc.Stratum == s(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', 'o');
-end
-
-m_grid('box', 'on')
-legend(h, s, 'Location', 'SouthEast')
-
-print(fullfile(resultsDir, 'NASC - AMLR'), '-dpng','-r300')
-
-%%%%%%%%%%%
-figure(4)
-clf
-
-s = ["ESS" "Sand" "SG" "SS" "AP" "SSI"];
-plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
-    'strata', s, 'showStrataNames', false, ...
-    'coastDetail', 'intermediate')
-maxNASC = max(nasc.NASC);
-
-h = [];
-for i = 1:length(s)
-    j = find(nasc.Stratum == s(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', 'o');
-end
-
-m_grid('box', 'on')
-legend(h, s, 'Location', 'SouthEast')
-
-print(fullfile(resultsDir, 'NASC - CCAMLR 2000'), '-dpng','-r300')
-
-%%%%%%%%%%%
-figure(5)
-clf
-
-s = ["SOI" "SOC" "SOF"];
-plot_standard_map(strata, 'centrePoint', [-45 -61], 'radius', 2.5, ...
-    'strata', s, 'showStrataNames', false, ...
-    'coastDetail', 'fine')
-maxNASC = max(nasc.NASC);
-
-h = [];
-for i = 1:length(s)
-    j = find(nasc.Stratum == s(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.NASC(j)/maxNASC*200+1, 'filled', 'o');
-end
-
-m_grid('box', 'on')
-legend(h, s, 'Location', 'SouthEast')
-
-print(fullfile(resultsDir, 'NASC - South Orkney'), '-dpng','-r300')
-
-% Map of transect data and their names
-figure(6)
-clf
-plot_standard_map(strata)
-
-transects = unique(nasc.Stratum + nasc.Transect);
-
-for i = 1:length(transects)
-    k = find(nasc.Stratum+nasc.Transect == transects(i));
-    m_plot(nasc.Longitude(k), nasc.Latitude(k), 'k.');
-    hold on
-    % and a label at the northernmost part
-    [~, n_i] = max(nasc.Latitude(k));
-    m_text(nasc.Longitude(k(n_i)), nasc.Latitude(k(n_i)), transects(i))
-end
-
-m_grid('box', 'on')
-
-print(fullfile(resultsDir, 'Transects - as done and labelled'), '-dpng','-r300')
-
 
