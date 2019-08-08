@@ -211,7 +211,7 @@ print(fullfile(resultsDir, 'Trawls - map'), '-dpng','-r300')
 figure(4) % LF's per strata
 clf
 for i = 1:length(lf.strata)
-    subplot(4,3,i)
+    subplot(4,4,i)
     lf.strata(i).histedges
     histogram('BinEdges', lf.strata(i).histedges, ...
         'BinCounts', lf.strata(i).histcounts)
