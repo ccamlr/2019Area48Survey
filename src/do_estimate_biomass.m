@@ -212,7 +212,7 @@ results.biomass_survey = t;
 t = struct2table(results.strata);
 t = removevars(t, {'transect', 'stratumLength' 'CV' 'densityVariance' 'varianceComponent_transect'});
 t = movevars(t,'biomass','Before','varianceComponent_stratum');
-t = t([2 1 7 3 4 6 5 9 10 11 8],:); % adhocery... sort rows to match some existing reports
+t = t([2 1 7 3 4 6 5 9 10 11 8 12 13],:); % adhocery... sort rows to match some existing reports
 t.Properties.VariableNames{end} = 'varianceComponent';
 t.Properties.VariableUnits={'' 'km^2' 'gm^-2' 't' 't^2'};
 results.biomass_strata = t;
@@ -229,18 +229,20 @@ strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey stra
 
 % Use the same max scale across all plots
 maxRho = max(nasc.rho);
+maxSize = 200; % [points^2] of drawn circles
+legendScatterSizes = [50 500 2500 5000]; % [g/m^2]
 
 % Map coloured by vessel
 figure(1)
 clf
-plot_standard_map(strata)
+plot_standard_map(strata, 'showStrataNames', false)
 
 % Use a different colour for each vessel
 v = unique(nasc.Vessel);
 h = nan(length(v), 1);
 for i = 1:length(v)
     j = find(nasc.Vessel == v(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled');
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled');
 end
 
 m_grid('box', 'on')
@@ -248,11 +250,10 @@ legend(h, v, 'Location', 'SouthEast')
 
 print(fullfile(resultsDir, 'Krill density - by vessel'), '-dpng','-r300')
 
-% Map coloured by stratum. Do several, based on different areas
-% Entire area. Too crowded to be really useful...
+% Map coloured by stratum. Too crowded to be really useful...
 figure(2)
 clf
-plot_standard_map(strata)
+plot_standard_map(strata, 'showStrataNames', false)
 
 % Use a different colour and symbol for each statum
 
@@ -261,7 +262,7 @@ symbols = {'o' 'o' 'o' 'o' 'o' 'o' 'o' 'd' 'd' 'd' 'd' 'd' 'd' 'd'};
 h = [];
 for i = 1:length(s)
     j = find(nasc.Stratum == s(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled', symbols{i});
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled', symbols{i});
 end
 
 m_grid('box', 'on')
@@ -278,14 +279,11 @@ plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
     'strata', s, 'showStrataNames', false, ...
     'coastDetail', 'high')
 
-h = [];
 for i = 1:length(s)
     j = find(nasc.Stratum == s(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled', 'o');
+    m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled', 'o');
 end
-
-m_grid('box', 'on')
-legend(h, s, 'Location', 'SouthEast')
+plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
 
 print(fullfile(resultsDir, 'Krill density - AMLR'), '-dpng','-r300')
 
@@ -297,16 +295,12 @@ s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
 plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
     'strata', s, 'showStrataNames', false, ...
     'coastDetail', 'intermediate')
-maxNASC = max(nasc.NASC);
 
-h = [];
 for i = 1:length(s)
     j = find(nasc.Stratum == s(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled', 'o');
+     m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled', 'o');
 end
-
-m_grid('box', 'on')
-legend(h, s, 'Location', 'SouthEast')
+plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
 
 print(fullfile(resultsDir, 'Krill density - CCAMLR 2000'), '-dpng','-r300')
 
@@ -315,18 +309,15 @@ figure(5)
 clf
 
 s = ["SOI" "SOC" "SOF"];
-plot_standard_map(strata, 'centrePoint', [-45 -61], 'radius', 2.5, ...
+plot_standard_map(strata, 'centrePoint', [-45.7 -60.75], 'radius', 2.5, ...
     'strata', s, 'showStrataNames', false, ...
     'coastDetail', 'fine')
 
-h = [];
 for i = 1:length(s)
     j = find(nasc.Stratum == s(i));
-    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled', 'o');
+    m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled', 'o');
 end
-
-m_grid('box', 'on')
-legend(h, s, 'Location', 'SouthEast')
+plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
 
 print(fullfile(resultsDir, 'Krill density - South Orkney'), '-dpng','-r300')
 
