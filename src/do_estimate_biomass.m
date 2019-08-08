@@ -17,7 +17,8 @@ resultsDir = fullfile(baseDir, repoDir, 'results');
 % Units are km^2
 s = {'AP', 473318; 'SS' 1109789; 'ESS', 321800; ...
     'SSI', 48654; 'SOI', 24409; 'SG', 25000; 'Sand', 62274; ...
-    'Joinville', 18151; 'Elephant', 43865; 'West', 38524; 'Bransfield', 24479};
+    'Joinville', 18151; 'Elephant', 43865; 'West', 38524; 'Bransfield', 24479; ...
+    'SOF', 0; 'SOC', 0};
 % and turn this into a more useful structure
 strata_area(size(s,1)) = struct('name',[], 'area', []);
 for i = 1:size(s,1)
@@ -69,6 +70,15 @@ for i = 1:height(nasc)
         nasc.C(i) = NaN; % for nasc values in strata without a krill lf, or where a strata is not present.
     end
 end
+
+% and to produce plots of krill areal density later on, calculate a krill
+% density for each nasc value.
+nasc.rho = nasc.NASC .* nasc.C / 1852^2;
+
+% and set the units for the nasc columns to make it clear what is what.
+% Uses the UDUNITS convention.
+nasc.Properties.VariableUnits = {'' 'degrees_north' 'degrees_east' ...
+    'm^2 nautical_mile^-2' '' '' '' 'g m^-2' 'g m^-2'};
 
 % Now calculate biomass density for each transect, stratum and finally
 % survey. This follows the equations in EMM-16/38 section 9, with some
@@ -143,6 +153,13 @@ results.survey(1).strata = ["AP", "SS", "SSI", "SOI", "Sand", "ESS"];
 results.survey(2).name = 'AMLR 2019';
 results.survey(2).strata = ["Joinville", "Elephant", "West", "Bransfield"];
 
+results.survey(3).name = 'Norway1';
+results.survey(3).strata = ["SOF"];
+
+results.survey(4).name = 'Norway1';
+results.survey(4).strata = ["SOC"];
+
+
 for s = 1:length(results.survey)
     % identify which strata are in this survey
     k = find(ismember([results.strata.name],results.survey(s).strata));
@@ -202,4 +219,117 @@ results.biomass_strata = t;
 
 % and save the results
 save(fullfile(resultsDir, 'Final results'), 'results')
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% And now produce some plots of krill areal density. These are very similar
+% to what is done in the do_combine_nasc.m script, but use areal density
+% rather than NASC.
+
+strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey strata.geojson')));
+
+% Use the same max scale across all plots
+maxRho = max(nasc.rho);
+
+% Map coloured by vessel
+figure(1)
+clf
+plot_standard_map(strata)
+
+% Use a different colour for each vessel
+v = unique(nasc.Vessel);
+h = nan(length(v), 1);
+for i = 1:length(v)
+    j = find(nasc.Vessel == v(i));
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled');
+end
+
+m_grid('box', 'on')
+legend(h, v, 'Location', 'SouthEast')
+
+print(fullfile(resultsDir, 'Krill density - by vessel'), '-dpng','-r300')
+
+% Map coloured by stratum. Do several, based on different areas
+% Entire area. Too crowded to be really useful...
+figure(2)
+clf
+plot_standard_map(strata)
+
+% Use a different colour and symbol for each statum
+
+s = unique(nasc.Stratum);
+symbols = {'o' 'o' 'o' 'o' 'o' 'o' 'o' 'd' 'd' 'd' 'd' 'd' 'd' 'd'};
+h = [];
+for i = 1:length(s)
+    j = find(nasc.Stratum == s(i));
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled', symbols{i});
+end
+
+m_grid('box', 'on')
+legend(h, s, 'Location', 'SouthEast', 'NumColumns', 2, 'Interpreter', 'none')
+
+print(fullfile(resultsDir, 'Krill density - by stratum'), '-dpng','-r300')
+
+%%%%%%%%%%%
+figure(3)
+clf
+
+s = ["Bransfield" "Elephant" "Joinville" "West"];
+plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
+    'strata', s, 'showStrataNames', false, ...
+    'coastDetail', 'high')
+
+h = [];
+for i = 1:length(s)
+    j = find(nasc.Stratum == s(i));
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled', 'o');
+end
+
+m_grid('box', 'on')
+legend(h, s, 'Location', 'SouthEast')
+
+print(fullfile(resultsDir, 'Krill density - AMLR'), '-dpng','-r300')
+
+%%%%%%%%%%%
+figure(4)
+clf
+
+s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
+plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
+    'strata', s, 'showStrataNames', false, ...
+    'coastDetail', 'intermediate')
+maxNASC = max(nasc.NASC);
+
+h = [];
+for i = 1:length(s)
+    j = find(nasc.Stratum == s(i));
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled', 'o');
+end
+
+m_grid('box', 'on')
+legend(h, s, 'Location', 'SouthEast')
+
+print(fullfile(resultsDir, 'Krill density - CCAMLR 2000'), '-dpng','-r300')
+
+%%%%%%%%%%%
+figure(5)
+clf
+
+s = ["SOI" "SOC" "SOF"];
+plot_standard_map(strata, 'centrePoint', [-45 -61], 'radius', 2.5, ...
+    'strata', s, 'showStrataNames', false, ...
+    'coastDetail', 'fine')
+
+h = [];
+for i = 1:length(s)
+    j = find(nasc.Stratum == s(i));
+    h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*200+1, 'filled', 'o');
+end
+
+m_grid('box', 'on')
+legend(h, s, 'Location', 'SouthEast')
+
+print(fullfile(resultsDir, 'Krill density - South Orkney'), '-dpng','-r300')
+
+
+
 
