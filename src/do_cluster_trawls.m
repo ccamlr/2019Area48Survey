@@ -2,9 +2,7 @@
 % Load in krill lengths from trawls and calculate length lf in various
 % ways (by vessel, by strata, by cluster).
 
-baseDir = 'I:\KRILL2019';
-repoDir = '2019Area48SurveyRepo';
-resultsDir = fullfile(baseDir, repoDir, 'results');
+do_define_directories
 dataDir = fullfile(baseDir, 'data', 'catch');
 
 clear lf

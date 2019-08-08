@@ -5,10 +5,8 @@
 % necessary.
 
 % Storage parameters
-baseDir = 'I:\KRILL2019';
-repoDir = '2019Area48SurveyRepo';
+do_define_directories
 SDWBAdir = fullfile(baseDir, repoDir, 'src', 'SDWBApackage2010');
-resultsDir = fullfile(baseDir, repoDir, 'results');
 
 resultsFile = 'SDWBA-TS-2019';
 

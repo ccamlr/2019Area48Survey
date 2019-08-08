@@ -27,6 +27,11 @@ do_calculate_ts
 %% Calculate the biomass
 do_estimate_biomass
 
+%% Show the biomass results formatted to make it easy to copy/paste into the ASAM report
+do_define_directories
+
+load(fullfile(resultsDir, 'Final results'), 'results')
+
 % Show the per strata results
 disp('Results per strata:')
 disp(results.biomass_strata)

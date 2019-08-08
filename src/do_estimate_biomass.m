@@ -1,9 +1,7 @@
 %%
 % Estimate the krill biomass per strata and per survey
 
-baseDir = 'I:\KRILL2019';
-repoDir = '2019Area48SurveyRepo';
-resultsDir = fullfile(baseDir, repoDir, 'results');
+do_define_directories
 
 % Strata areas. 
 

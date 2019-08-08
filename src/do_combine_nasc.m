@@ -2,11 +2,9 @@
 % A script to combine the Echoview integrals from each vessel into one
 % dataset, with each NASC value labelled with vessel and transect name.
 
-baseDir = 'I:\KRILL2019';
-repoDir = '2019Area48SurveyRepo';
-
+do_define_directories
 dataDir = fullfile(baseDir, 'data', 'echo-integration');
-resultsDir = fullfile(baseDir, repoDir, 'results');
+
 
 vessels = {'CDH' 'KJH' 'KPH' 'MS' 'FRH' 'RRS'};
 

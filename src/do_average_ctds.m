@@ -3,9 +3,7 @@
 % Calculate a survey-wide sound speed and absorption value using all of the
 % CTD's taken during the 2019 survey
 
-baseDir = 'I:\KRILL2019';
-repoDir = '2019Area48SurveyRepo';
-resultsDir = fullfile(baseDir, repoDir, 'results');
+do_define_directories
 dataDir = fullfile(baseDir, 'data', 'ctd');
 
 % polygons that define the survey strata
