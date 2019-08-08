@@ -271,7 +271,7 @@ print(fullfile(resultsDir, 'NASC - AMLR'), '-dpng','-r300')
 figure(4)
 clf
 
-s = ["ESS" "Sand" "SG" "SS" "AP"];
+s = ["ESS" "Sand" "SG" "SS" "AP" "SSI"];
 plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
     'strata', s, 'showStrataNames', false, ...
     'coastDetail', 'intermediate')
