@@ -69,6 +69,9 @@ for i = 1:height(nasc)
     end
 end
 
+% try assigning all NASC to a single cluster lf
+%nasc.C = repelem(lf.cluster(1).C, height(nasc), 1);
+
 % and to produce plots of krill areal density later on, calculate a krill
 % density for each nasc value.
 nasc.rho = nasc.NASC .* nasc.C / 1852^2;
