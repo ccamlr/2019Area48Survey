@@ -91,15 +91,27 @@ m = mean(Xd, 2);
 s = std(Xd, 0, 2);
 Xd = (Xd - repmat(m, 1, size(Xd, 2))) ./ repmat(s, 1, size(Xd, 2));
 
-D = pdist(X, 'euclidean');
-Z = linkage(D, 'ward');
+D = pdist(Xd, 'euclidean');
+
+% Try several linkage method and pick the best
+link_methods = {'average' 'centroid' 'complete' 'median' 'single' 'ward' 'weighted'};
+aggloCoeff = zeros(size(link_methods));
+for i = 1:length(link_methods)
+    Z = linkage(D, link_methods{i});
+    % how good was the clustering?
+    aggloCoeff(i) = cophenet(Z, D);
+    disp([link_methods{i} ' ' num2str(aggloCoeff(i))])
+end
+% Use the best one...
+[~, i] = max(aggloCoeff);
+Z = linkage(D, link_methods{i});
+disp(['Best linkage method is: ' link_methods{i} ', coeff = ' num2str(aggloCoeff(i))])
+
 clusters = cluster(Z, 'MaxClust',3);
 % This does it in one go, but we don't get the data necessary to draw a
 % dendrogram.
 %T = clusterdata(X, 'Distance', 'euclidean', 'Linkage', 'ward', 'MaxClust', 3);
 
-% how good was the clustering?
-aggloCoeff = cophenet(Z, D)
 
 % lf per cluster
 for i = 1:length(unique(clusters))
@@ -147,6 +159,14 @@ disp(struct2table(lf.strata))
 disp('Trawls by cluster:')
 disp(struct2table(lf.cluster))
 
+% Print out the overall mean length and std
+ll = [];
+for i = 1:length(lf_raw)
+    ll = [ll; lf_raw(i).lengths];
+end
+disp(['Overall krill mean length: ' num2str(mean(ll)) ' mm'])
+disp(['Overall krill std length: ' num2str(std(ll)) ' mm'])
+
 % save the results from the processing
 save(fullfile(resultsDir, 'Trawls - data'), 'lf_raw', 'lf', 'aggloCoeff');
 
@@ -173,13 +193,14 @@ print(fullfile(resultsDir, 'Trawls - cluster lf'), '-dpng','-r300')
 %%%%%%%%%%%%%%%%%%%%%%%
 figure(2) % Dendrogram of clusters
 clf
-dendrogram(Z)
+dendrogram(Z,size(Z,1))
+set(gca,'XTickLabel', {}, 'YTickLabel', {})
 print(fullfile(resultsDir, 'Trawls - dendrogram'), '-dpng','-r300')
 
 %%%%%%%%%%%%%%%%%%%%%%
 figure(3) % Map of stations, clusters, and strata
 clf
-plot_standard_map(strata)
+plot_standard_map(strata, 'showStrataNames', false)
 
 % plot the station positions
 clear h labels
@@ -211,7 +232,8 @@ clf
 for i = 1:length(lf.strata)
     subplot(4,4,i)
     histogram('BinEdges', lf.strata(i).histedges, ...
-        'BinCounts', lf.strata(i).histcounts)
+        'BinCounts', lf.strata(i).histcounts, 'EdgeColor', 'none', ...
+        'FaceColor', 'k')
     textLoc(lf.strata(i).stratum, 'NorthWest');
     if i >= 13
         xlabel('Length (mm)')
@@ -221,7 +243,8 @@ for i = 1:length(lf.cluster)
     j = length(lf.strata) + i;
     subplot(4,4,j)
     histogram('BinEdges', lf.cluster(i).histedges, ...
-        'BinCounts', lf.cluster(i).histcounts)
+        'BinCounts', lf.cluster(i).histcounts, 'EdgeColor', 'none', ...
+        'FaceColor', 'k')
     textLoc(lf.cluster(i).cluster, 'NorthWest');
     if j >= 13
         xlabel('Length (mm)')
