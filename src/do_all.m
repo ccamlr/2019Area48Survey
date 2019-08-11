@@ -39,11 +39,11 @@ disp(results.biomass_strata)
 disp('Results per survey:')
 disp(results.biomass_survey)
 
-
 % Do it to make it easy to copy/paste an appropriately formatted
 % table into the ASAM report (via Excel)
 disp('strata for pasting:')
 
+jf = java.text.DecimalFormat; % formatting with thousands commas
 for i = 1:height(results.biomass_strata)
     r = results.biomass_strata(i,2:5);
     fprintf('%s; %.1f; %s; %s,000\n', jf.format(r.area), r.meanDensity, ...

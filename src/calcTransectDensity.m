@@ -86,7 +86,7 @@ function [rho_j, L_j] = calcDensity(data)
        course(i) = c;
    end
    
-   W_I = ones(numInts, 1)
+   W_I = ones(numInts, 1);
    
    % Compute transect length (n.mi.) by summing interval lengths
    L_j = sum(W_I);
