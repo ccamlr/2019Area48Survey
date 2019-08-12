@@ -177,7 +177,9 @@ for k = 1:2
     %title(contourText)
 end
 
-print(fullfile(resultsDir, 'CTD - station map'), '-dpng','-r300')
+ifile = fullfile(resultsDir, 'CTD - station map.png');
+print(ifile, '-dpng','-r300')
+crop_image(ifile)
 
 % save the results
 save(fullfile(resultsDir, 'CTD - data'), 'ctd', 'results', 'uniform')

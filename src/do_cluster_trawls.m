@@ -16,11 +16,14 @@ for i = 1:length(vessels)
     j = find(strcmp({lf_raw.vessel}, vessels{i}));
     ll = cat(1,lf_raw(j).lengths);
     
+    numTidStn = sum(strcmp({lf_raw(j).type}, 'TID'));
+    
     lf.vessel(i) = struct('vessel', vessels{i}, ...
         'mean', mean(ll), ...
         'std', std(ll), 'min', min(ll), ...
         'max', max(ll), 'numLengths', length(ll), ...
-        'numStations', length(j));
+        'numStations', length(j), ...
+        'numTidStations', numTidStn);
 end
 
 % Some lf per station
@@ -44,7 +47,7 @@ end
 % Clustering, as per the EMM report (and hence similar to the 2000 CCAMLR method)
 % Uses the Matlab statistics toolbox functions.
 
-% only do this on trawls with more than minNumKrill krill 
+% only do this on trawls with more than minNumKrill krill
 minNumKrill = 20;
 stationsToUse = find(lf.station.num >= minNumKrill);
 stationsToNotUse = find(lf.station.num < minNumKrill);
@@ -152,6 +155,10 @@ end
 % Summary of trawls per vessel
 disp('Trawls by vessel:')
 disp(struct2table(lf.vessel))
+disp(['Total number of trawls was ' num2str(sum([lf.vessel.numStations]))])
+disp(['Total number of pre-determined trawls with >20 krill was ' num2str(sum([lf.vessel.numClusteredStations]))])
+disp(['Total number of TID trawls was ' num2str(sum([lf.vessel.numTidStations]))])
+
 % Summary of trawls per strata
 disp('Trawls by strata:')
 disp(struct2table(lf.strata))
@@ -188,14 +195,20 @@ for i = 1:length(unique(clusters))
     textLoc(['Cluster ' num2str(i)], 'NorthWest');
 end
 xlabel('Length (mm)')
-print(fullfile(resultsDir, 'Trawls - cluster lf'), '-dpng','-r300')
+
+ifile = fullfile(resultsDir, 'Trawls - cluster lf.png');
+print(ifile, '-dpng','-r300')
+crop_image(ifile)
 
 %%%%%%%%%%%%%%%%%%%%%%%
 figure(2) % Dendrogram of clusters
 clf
 dendrogram(Z,size(Z,1))
 set(gca,'XTickLabel', {}, 'YTickLabel', {})
-print(fullfile(resultsDir, 'Trawls - dendrogram'), '-dpng','-r300')
+
+ifile = fullfile(resultsDir, 'Trawls - dendrogram.png');
+print(ifile, '-r300', '-dpng')
+crop_image(ifile)
 
 %%%%%%%%%%%%%%%%%%%%%%
 figure(3) % Map of stations, clusters, and strata
@@ -208,7 +221,7 @@ clear h labels
 % Plot the stations that weren't used
 for i = 1:length(stationsToNotUse)
     h(1) = m_scatter([lf_raw(stationsToNotUse(i)).lon], ...
-        [lf_raw(stationsToNotUse(i)).lat], 20, 'k');
+        [lf_raw(stationsToNotUse(i)).lat], 10, 'k');
 end
 labels{1} = 'Not used';
     
@@ -216,7 +229,7 @@ labels{1} = 'Not used';
 for i = 1:length(unique(clusters))
     j = clusters == i;
     ii = stationsToUse(j);
-    h(i+1) = m_scatter([lf_raw(ii).lon], [lf_raw(ii).lat], 20, 'filled');
+    h(i+1) = m_scatter([lf_raw(ii).lon], [lf_raw(ii).lat], 15, 'filled');
     labels{i+1} = ['C' num2str(i)];
 end
 
@@ -224,7 +237,9 @@ m_grid('box', 'on')
 h = legend(h, labels, 'Location', 'southeast');
 title(h, 'Clusters')
 
-print(fullfile(resultsDir, 'Trawls - map'), '-dpng','-r300')
+ifile = fullfile(resultsDir, 'Trawls - map.png');
+print(ifile, '-dpng','-r300')
+crop_image(ifile)
 
 %%%%%%%%%%%%%%%%
 figure(4) % All the lf's
@@ -251,7 +266,9 @@ for i = 1:length(lf.cluster)
     end
 end
 
-print(fullfile(resultsDir, 'Trawls - lf per stratum'), '-dpng', '-r300')
+ifile = fullfile(resultsDir, 'Trawls - lf per stratum.png');
+print(ifile, '-dpng', '-r300')
+crop_image(ifile)
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -267,21 +284,27 @@ function lf = load_lf_data(dataDir)
     c = readtable(fullfile(dataDir, 'RRS.xlsx'));
     s = readtable(fullfile(dataDir, 'RRS_station_info.csv'));
 
-    stations = unique(c.Event_number);
+    stations = unique(s.EventNo);
     k = length(lf);
     for i = 1:length(stations)
         j = c.Event_number == stations(i);
         
-        kk = find(s.EventNo == stations(i) & strcmp(s.Action, 'Net 1 opened'));
+        kk = find(s.EventNo == stations(i) & strcmpi(s.Action, 'Net 1 opened'));
         if length(kk) ~= 1
             warning('No single station info found')
+        end
+        
+        if strcmp(s.Comment(kk), 'Stratified')
+            stnType = 'STN';
+        else
+            stnType = 'TID';
         end
         
         lf(k) = struct('vessel', 'RSS', 'station', stations(i), ...
             'lengths', c.Length(j), ...
             'lat', s.Latitude(kk), 'lon', s.Longitude(kk), ...
             'timestamp', datenum(s.timestamp(kk)), ...
-            'type', 'STN');
+            'type', stnType);
         k = k + 1;
     end
     
@@ -355,13 +378,18 @@ function lf = load_lf_data(dataDir)
                 
         lengths = repelem(c.len(j), c.antall(j));
         lengths = reshape(lengths, [], 1); % force to be a column vector
-        
+
+        stnType = 'STN';
+        if ismember(stations(i), [4002])
+            stnType = 'TID';
+        end
+                
         if ~isempty(lengths)
             lf(k) = struct('vessel', 'KPH', 'station', stations(i), ...
                 'lengths', lengths, ...
                 'lat', c.lat(j(1)), 'lon', c.lon(j(1)), ...
                 'timestamp', datenum(c.aar(j(1)), c.mnd(j(1)), c.dag(j(1)), ...
-                h, m, 0),  'type', 'STN');
+                h, m, 0),  'type', stnType);
             k = k + 1;
         end
     end
@@ -385,7 +413,12 @@ function lf = load_lf_data(dataDir)
         % pick out hour and minute of the time
         h = fix(c.starttid(j(1))/100);
         m = c.starttid(j(1)) - h*100;
-                
+        
+        stnType = 'STN';
+        if ismember(stations(i), [4266 4267 4273 4308 4311 4317])
+            stnType = 'TID';
+        end
+        
         lengths = repelem(c.len(j), c.antall(j));
         
         if ~isempty(lengths)
@@ -393,12 +426,12 @@ function lf = load_lf_data(dataDir)
                 'lengths', lengths, ...
                 'lat', c.lat(j(1)), 'lon', c.lon(j(1)), ...
                 'timestamp', datenum(c.aar(j(1)), c.mnd(j(1)), c.dag(j(1)), ...
-                h, m, 0),  'type', 'STN');
+                h, m, 0),  'type', stnType);
             k = k + 1;
         end
     end
     
-    % Kwang Ja Ho (data not yet received)
+    % Kwang Ja Ho
     disp('Loading Kwang Ja Ho data')
     
     c = readtable(fullfile(dataDir, 'KJH.xlsx'), 'Sheet', 'Krill length frequency data');

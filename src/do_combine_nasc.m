@@ -222,7 +222,9 @@ if false % these plots have been moved to showing rho, and are now down in the d
     m_grid('box', 'on')
     legend(h, v, 'Location', 'SouthEast')
     
-    print(fullfile(resultsDir, 'NASC - by vessel'), '-dpng','-r300')
+    ifile = fullfile(resultsDir, 'NASC - by vessel.png');
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
     
     % Map coloured by stratum. Do several, based on different areas
     % Entire area. Too crowded to be really useful...
@@ -243,7 +245,9 @@ if false % these plots have been moved to showing rho, and are now down in the d
     m_grid('box', 'on')
     legend(h, s, 'Location', 'SouthEast', 'NumColumns', 2, 'Interpreter', 'none')
     
-    print(fullfile(resultsDir, 'NASC - by stratum'), '-dpng','-r300')
+    ifile = fullfile(resultsDir, 'NASC - by stratum.png');
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
     
     %%%%%%%%%%%
     figure(3)
@@ -264,7 +268,9 @@ if false % these plots have been moved to showing rho, and are now down in the d
     m_grid('box', 'on')
     legend(h, s, 'Location', 'SouthEast')
     
-    print(fullfile(resultsDir, 'NASC - AMLR'), '-dpng','-r300')
+    ifile = fullfile(resultsDir, 'NASC - AMLR.png');
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
     
     %%%%%%%%%%%
     figure(4)
@@ -285,7 +291,9 @@ if false % these plots have been moved to showing rho, and are now down in the d
     m_grid('box', 'on')
     legend(h, s, 'Location', 'SouthEast')
     
-    print(fullfile(resultsDir, 'NASC - CCAMLR 2000'), '-dpng','-r300')
+    ifile = fullfile(resultsDir, 'NASC - CCAMLR 2000.png');
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
     
     %%%%%%%%%%%
     figure(5)
@@ -306,7 +314,9 @@ if false % these plots have been moved to showing rho, and are now down in the d
     m_grid('box', 'on')
     legend(h, s, 'Location', 'SouthEast')
     
-    print(fullfile(resultsDir, 'NASC - South Orkney'), '-dpng','-r300')
+    ifile = fullfile(resultsDir, 'NASC - South Orkney.png');
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
     
     % Map of transect data and their names
     figure(6)
@@ -326,6 +336,8 @@ if false % these plots have been moved to showing rho, and are now down in the d
     
     m_grid('box', 'on')
     
-    print(fullfile(resultsDir, 'Transects - as done and labelled'), '-dpng','-r300')
+    ifile = fullfile(resultsDir, 'Transects - as done and labelled.png');
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
 end
 

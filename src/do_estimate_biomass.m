@@ -28,7 +28,7 @@ surveys(s).strata = "SOC"; s = s + 1;
 s = {'AP', 473318; 'SS' 1109789; 'ESS', 321800; ...
     'SSI', 48654; 'SOI', 24409; 'SG', 25000; 'Sand', 62274; ...
     'Elephant', 43865; 'West', 38524; 'Bransfield', 24479; ...
-    'Joinville', 18151, 'SOF', 0; 'SOC', 0};
+    'Joinville', 18151; 'SOF', 0; 'SOC', 0};
 
 % and turn the areas into a more useful structure
 strata_area(size(s,1)) = struct('name',[], 'area', []);
@@ -125,7 +125,9 @@ end
 m_grid('box', 'on')
 legend(h, v, 'Location', 'SouthEast')
 
-print(fullfile(resultsDir, 'Krill density - by vessel'), '-dpng','-r300')
+ifile = fullfile(resultsDir, 'Krill density - by vessel.png');
+print(ifile, '-dpng','-r300')
+crop_image(ifile)
 
 % Map coloured by stratum. Too crowded to be really useful...
 figure(2)
@@ -145,7 +147,9 @@ end
 m_grid('box', 'on')
 legend(h, s, 'Location', 'SouthEast', 'NumColumns', 2, 'Interpreter', 'none')
 
-print(fullfile(resultsDir, 'Krill density - by stratum'), '-dpng','-r300')
+ifile = fullfile(resultsDir, 'Krill density - by stratum.png');
+print(ifile, '-dpng','-r300')
+crop_image(ifile)
 
 %%%%%%%%%%%
 figure(3)
@@ -162,7 +166,9 @@ for i = 1:length(s)
 end
 plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
 
-print(fullfile(resultsDir, 'Krill density - AMLR'), '-dpng','-r300')
+ifile = fullfile(resultsDir, 'Krill density - AMLR.png');
+print(ifile, '-dpng','-r300')
+crop_image(ifile)
 
 %%%%%%%%%%%
 figure(4)
@@ -179,7 +185,9 @@ for i = 1:length(s)
 end
 plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
 
-print(fullfile(resultsDir, 'Krill density - CCAMLR 2000'), '-dpng','-r300')
+ifile = fullfile(resultsDir, 'Krill density - CCAMLR 2000.png');
+print(ifile, '-dpng','-r300')
+crop_image(ifile)
 
 %%%%%%%%%%%
 figure(5)
@@ -196,8 +204,9 @@ for i = 1:length(s)
 end
 plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
 
-print(fullfile(resultsDir, 'Krill density - South Orkney'), '-dpng','-r300')
-
+ifile = fullfile(resultsDir, 'Krill density - South Orkney.png');
+print(ifile, '-dpng','-r300')
+crop_image(ifile)
 
 
 
