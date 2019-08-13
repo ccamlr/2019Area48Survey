@@ -195,6 +195,12 @@ nasc.Ping_timestamp.Format = 'yyyy-MM-dd HH:mm:ss.SSSS';
 nasc = removevars(nasc, {'Ping_date', 'Ping_time'});
 nasc = movevars(nasc, {'Ping_timestamp'}, 'Before', 1);
 
+% flag each nasc value to show if it was taken within (or not) civil
+% daylight hours.
+for i = 1:height(nasc)
+    nasc.civilDaytime(i) = dayOrNight(nasc.Longitude(i), nasc.Latitude(i), nasc.Ping_timestamp(i));
+end
+
 % and save the combined dataset
 save(fullfile(resultsDir, 'NASC - data'), 'nasc')
 
