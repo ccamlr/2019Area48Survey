@@ -91,6 +91,14 @@ nasc.rho = nasc.NASC .* nasc.C / 1852^2;
 nasc.Properties.VariableUnits = {'' 'degrees_north' 'degrees_east' ...
     'm^2 nautical_mile^-2' '' '' '' 'g m^-2' 'g m^-2'};
 
+% flag each nasc value to show if it was taken within (or not) civil
+% daylight hours.
+for i = 1:height(nasc)
+    nasc.civilDaytime(i) = dayOrNight(nasc.Longitude(i), nasc.Latitude(i), nasc.Ping_timestamp(i));
+end
+
+nasc_day = nasc(nasc.civilDaytime == true,:);
+
 % Where the real numbers get made...
 results = calcBiomass(nasc, strata_area, surveys);
 
