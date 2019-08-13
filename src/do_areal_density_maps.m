@@ -1,0 +1,109 @@
+function do_areal_density_maps(nasc, strata, prefix, saveDir)
+% Make various plots of the krill areal density. 
+
+    % Use the same max scale across all plots
+    maxRho = max(nasc.rho);
+    maxSize = 200; % [points^2] of drawn circles
+    legendScatterSizes = [50 500 2500 5000]; % [g/m^2]
+
+    % Map coloured by vessel
+    figure(1)
+    clf
+    plot_standard_map(strata, 'showStrataNames', false)
+
+    % Use a different colour for each vessel
+    v = unique(nasc.Vessel);
+    h = nan(length(v), 1);
+    for i = 1:length(v)
+        j = find(nasc.Vessel == v(i));
+        h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled');
+    end
+
+    m_grid('box', 'on')
+    legend(h, v, 'Location', 'SouthEast')
+
+    ifile = fullfile(saveDir, [prefix ' - by vessel.png']);
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
+
+    % Map coloured by stratum. Too crowded to be really useful...
+    figure(2)
+    clf
+    plot_standard_map(strata, 'showStrataNames', false)
+
+    % Use a different colour and symbol for each statum
+
+    s = unique(nasc.Stratum);
+    symbols = {'o' 'o' 'o' 'o' 'o' 'o' 'o' 'd' 'd' 'd' 'd' 'd' 'd' 'd'};
+    h = nan(size(s));
+    for i = 1:length(s)
+        j = find(nasc.Stratum == s(i));
+        h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled', symbols{i});
+    end
+
+    m_grid('box', 'on')
+    legend(h, s, 'Location', 'SouthEast', 'NumColumns', 2, 'Interpreter', 'none')
+
+    ifile = fullfile(saveDir, [prefix ' - by stratum.png']);
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
+
+    %%%%%%%%%%%
+    figure(3)
+    clf
+
+    s = ["Bransfield" "Elephant" "Joinville" "West"];
+    plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
+        'strata', s, 'showStrataNames', true, ...
+        'coastDetail', 'high')
+
+    for i = 1:length(s)
+        j = find(nasc.Stratum == s(i));
+        m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled', 'o');
+    end
+    plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
+
+    ifile = fullfile(saveDir, [prefix ' - AMLR.png']);
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
+
+    %%%%%%%%%%%
+    figure(4)
+    clf
+
+    s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
+    plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
+        'strata', s, 'showStrataNames', true, ...
+        'coastDetail', 'intermediate')
+
+    for i = 1:length(s)
+        j = find(nasc.Stratum == s(i));
+        m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled', 'o');
+    end
+    plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
+
+    ifile = fullfile(saveDir,   [prefix ' - CCAMLR 2000.png']);
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
+
+    %%%%%%%%%%%
+    figure(5)
+    clf
+
+    s = ["SOI" "SOC" "SOF"];
+    plot_standard_map(strata, 'centrePoint', [-45.7 -60.75], 'radius', 2.5, ...
+        'strata', s, 'showStrataNames', true, ...
+        'coastDetail', 'fine')
+
+    for i = 1:length(s)
+        j = find(nasc.Stratum == s(i));
+        m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled', 'o');
+    end
+    plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
+
+    ifile = fullfile(saveDir, [prefix ' - South Orkney.png']);
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
+end
+
+
