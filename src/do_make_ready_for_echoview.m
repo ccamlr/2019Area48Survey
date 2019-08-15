@@ -3,7 +3,8 @@
 % amplitude/angle data (a la EK60) and convert LSSS work files into
 % Echoview region and line files. 
 
-baseDir = 'I:\KRILL2019\cruise_folders';
+do_define_directories
+baseDir = fullfile(baseDir, 'cruise_folders');
 
 clear opt
 % Cabo de Hornos
