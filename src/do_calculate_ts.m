@@ -8,7 +8,7 @@
 do_define_directories
 SDWBAdir = fullfile(baseDir, repoDir, 'src', 'SDWBApackage2010');
 
-resultsFile = 'SDWBA-TS-2019';
+resultsFile = 'SDWBA-TS-2019-120kHz';
 
 addpath(SDWBAdir)
 
@@ -108,4 +108,28 @@ end
 
 rmpath(SDWBAdir)
 
+%%
+% and a little comparison between what is calculated above and what is in
+% Table 2 of WG-EMM-16/38
 
+figure(2)
+clf
+
+load SDWBA-TS-2019-038kHz.mat
+plot((10:67), 10*log10([krill_ts.ts.sigma_avg]) - ts.ts038')
+hold on
+
+load SDWBA-TS-2019-120kHz.mat
+plot((10:67), 10*log10([krill_ts.ts.sigma_avg]) - ts.ts120')
+
+load SDWBA-TS-2019-200kHz.mat
+plot((10:67), 10*log10([krill_ts.ts.sigma_avg]) - ts.ts200')
+
+xlabel('Length (mm)')
+ylabel('\Delta TS of krill (dB re 1m^2)')
+title({'Difference between WG-EMM-16/38 (Table 2)', ' and SDWBApackage2010'})
+grid
+legend('38 kHz','120 kHz','200 kHz')
+legend boxoff
+
+print(fullfile(resultsDir, 'SDWBA_TS_comparison'), '-dpng', '-r300')
