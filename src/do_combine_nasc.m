@@ -41,7 +41,10 @@ for i = 1:length(vessels)
 
             % To get the transects, we divide on time, based on manual
             % inspection. We use the AMLR stratum names but make up
-            % transect numbers (see EMM-11/26)
+            % transect numbers (see EMM-11/26). Note that FRH did extra
+            % transects that asked for. These extra ones are in the West
+            % stratum and overlap with those done by KJH. We don't use
+            % these extra transects.
             transects = {
                 '20190205T102300', '20190205T153100', "Elephant", "02";
                 '20190205T172300', '20190206T083050', "Elephant", "01";
@@ -54,12 +57,12 @@ for i = 1:length(vessels)
                 '20190208T101200', '20190208T133300', "Bransfield", "04";
                 '20190208T161900', '20190208T203000', "Bransfield", "05";
                 '20190208T231100', '20190209T021800', "Bransfield", "06";
-                '20190209T050200', '20190209T092301', "Bransfield", "07";
-                '20190209T113440', '20190209T153450', "West", "07";
-                '20190209T180130', '20190209T221645', "West", "06";
-                '20190210T003000', '20190210T054150', "West", "05";
-                '20190210T081200', '20190210T135850', "West", "04";
-                '20190210T161030', '20190210T211230', "West", "03"};
+                '20190209T050200', '20190209T092301', "Bransfield", "07"};
+                %'20190209T113440', '20190209T153450', "West", "07";
+                %'20190209T180130', '20190209T221645', "West", "06";
+                %'20190210T003000', '20190210T054150', "West", "05";
+                %'20190210T081200', '20190210T135850', "West", "04";
+                %'20190210T161030', '20190210T211230', "West", "03"};
                 
             t = n.Ping_date + timeofday(n.Ping_time);
             for k = 1:size(transects,1)
