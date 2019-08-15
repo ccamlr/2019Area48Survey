@@ -6,13 +6,15 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     maxSize = 200; % [points^2] of drawn circles
     legendScatterSizes = [50 500 2500 5000]; % [g/m^2]
 
-    % Map coloured by vessel
+    % Map coloured by vessel, CCAMLR 2000 strata
     figure(1)
     clf
-    plot_standard_map(strata, 'showStrataNames', false)
+    s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
+    plot_standard_map(strata, 'showStrataNames', false, 'strata', s)
 
     % Use a different colour for each vessel
-    v = unique(nasc.Vessel);
+    %v = unique(nasc.Vessel);
+    v = ["KPH" "CDH" "MS" "RRS"];
     h = nan(length(v), 1);
     for i = 1:length(v)
         j = find(nasc.Vessel == v(i));
@@ -22,12 +24,39 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     m_grid('box', 'on')
     legend(h, v, 'Location', 'SouthEast')
 
-    ifile = fullfile(saveDir, [prefix ' - by vessel.png']);
+    ifile = fullfile(saveDir, [prefix ' - by vessel - CCAMLR 2000 strata.png']);
     print(ifile, '-dpng','-r300')
     crop_image(ifile)
+    
+    % Map coloured by vessel, AMLR strata
+    figure(2)
+    clf
+    s = ["Bransfield" "Elephant" "Joinville" "West"];
+
+    plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
+        'strata', s, 'showStrataNames', true, ...
+        'coastDetail', 'high')
+
+    % Use a different colour for each vessel
+    %v = unique(nasc.Vessel);
+    v = ["FRH" "KJH"];
+    h = nan(length(v), 1);
+    for i = 1:length(v)
+        j = find(nasc.Vessel == v(i));
+        h(i) = m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled');
+    end
+
+    m_grid('box', 'on')
+    legend(h, v, 'Location', 'SouthEast')
+
+    ifile = fullfile(saveDir, [prefix ' - by vessel - CCAMLR 2000 strata.png']);
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
+   
+    
 
     % Map coloured by stratum. Too crowded to be really useful...
-    figure(2)
+    figure(3)
     clf
     plot_standard_map(strata, 'showStrataNames', false)
 
@@ -49,7 +78,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     crop_image(ifile)
 
     %%%%%%%%%%%
-    figure(3)
+    figure(4)
     clf
 
     s = ["Bransfield" "Elephant" "Joinville" "West"];
@@ -68,7 +97,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     crop_image(ifile)
 
     %%%%%%%%%%%
-    figure(4)
+    figure(5)
     clf
 
     s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
@@ -87,7 +116,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     crop_image(ifile)
 
     %%%%%%%%%%%
-    figure(5)
+    figure(6)
     clf
 
     s = ["SOI" "SOC" "SOF"];
