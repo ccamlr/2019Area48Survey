@@ -23,7 +23,8 @@ for i = 1:length(vessels)
         'std', std(ll), 'min', min(ll), ...
         'max', max(ll), 'numLengths', length(ll), ...
         'numStations', length(j), ...
-        'numTidStations', numTidStn);
+        'numTidStations', numTidStn, ...
+        'allLengths', ll);
 end
 
 % Some lf per station
@@ -182,9 +183,9 @@ save(fullfile(resultsDir, 'Trawls - data'), 'lf_raw', 'lf', 'aggloCoeff');
 writetable(tor, fullfile(resultsDir, 'Trawls - for Tor.csv'), ...
     'FileType', 'text', 'WriteRowNames', true);
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Do some plots
 
+%%%%%%%%%%%%%%%%%%%%%%
+% Do some plots
 %%%%%%%%%%%%%%%%%%%%%%
 figure(1) % Cluster lfs
 clf
@@ -269,6 +270,27 @@ end
 ifile = fullfile(resultsDir, 'Trawls - lf per stratum.png');
 print(ifile, '-dpng', '-r300')
 crop_image(ifile)
+
+%%%%%%%%%%%%%
+figure(5) % lf's per vessel
+clf
+for i = 1:length(lf.vessel)
+    subplot(3,2,i)
+
+    histogram(lf.vessel(i).allLengths, 'BinEdges', lengths, ...
+        'EdgeColor', 'none', ...
+        'FaceColor', 'k')
+    textLoc(lf.vessel(i).vessel, 'NorthWest');
+    %textLoc(['N=' num2str(lf.vessel(i).numStations)], 'NorthEast');
+    if i >= 5
+        xlabel('Length (mm)')
+    end
+end
+
+ifile = fullfile(resultsDir, 'Trawls - lf per vessel.png');
+print(ifile, '-dpng', '-r300')
+crop_image(ifile)
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
