@@ -49,7 +49,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     m_grid('box', 'on')
     legend(h, v, 'Location', 'SouthEast')
 
-    ifile = fullfile(saveDir, [prefix ' - by vessel - CCAMLR 2000 strata.png']);
+    ifile = fullfile(saveDir, [prefix ' - by vessel - AMLR strata.png']);
     print(ifile, '-dpng','-r300')
     crop_image(ifile)
    
