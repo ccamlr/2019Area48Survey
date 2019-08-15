@@ -10,11 +10,17 @@ clear lf
 % Load in the krill length data from the various ships
 lf_raw = load_lf_data(dataDir);
 
-% Some lf about the trawls
+% L50's from Bjørn Krafft, based on trawl type for each vessel
+L50 = struct('vessel', ["KPH" "CDH" "FRH" "MS" "KJH" "RRS"], ...
+    'L50', [15.01 15.01 31.92 41.55 25.72 12.96]);
+
+% Some lf about the trawls per vessel
 vessels = unique({lf_raw.vessel});
 for i = 1:length(vessels)
     j = find(strcmp({lf_raw.vessel}, vessels{i}));
     ll = cat(1,lf_raw(j).lengths);
+    
+    k = find(L50.vessel == vessels(i));
     
     numTidStn = sum(strcmp({lf_raw(j).type}, 'TID'));
     
@@ -24,7 +30,7 @@ for i = 1:length(vessels)
         'max', max(ll), 'numLengths', length(ll), ...
         'numStations', length(j), ...
         'numTidStations', numTidStn, ...
-        'allLengths', ll);
+        'allLengths', ll, 'L50', L50.L50(k));
 end
 
 % Some lf per station
@@ -53,10 +59,13 @@ minNumKrill = 20;
 stationsToUse = find(lf.station.num >= minNumKrill);
 stationsToNotUse = find(lf.station.num < minNumKrill);
 
-% update the vessel_lf structure to have how many trawls were used
+% update the vessel_lf structure with some more stats
 for i = 1:length(lf.vessel)
-    lf.vessel(i).numClusteredStations = sum(lf.station.num >= minNumKrill & ...
-        strcmp({lf_raw.vessel}, lf.vessel(i).vessel));
+    % stations for each vessel with more than 20 krill in them
+    stns20 = lf.station.num >= minNumKrill & strcmp({lf_raw.vessel}, lf.vessel(i).vessel);
+    lf.vessel(i).numClusteredStations = sum(stns20);
+    % lf from these trawls
+    lf.vessel(i).clusteredLengths = cat(1,lf_raw(stns20).lengths);
 end
 
 % combine all lf data into a length-binned single matrix.
@@ -274,13 +283,17 @@ crop_image(ifile)
 %%%%%%%%%%%%%
 figure(5) % lf's per vessel
 clf
+bins = 10:67;
 for i = 1:length(lf.vessel)
     subplot(3,2,i)
 
-    histogram(lf.vessel(i).allLengths, 'BinEdges', lengths, ...
+    histogram(lf.vessel(i).clusteredLengths, 'BinEdges', bins, ...
         'EdgeColor', 'none', ...
         'FaceColor', 'k')
-    textLoc(lf.vessel(i).vessel, 'NorthWest');
+    hold on
+    plot([lf.vessel(i).L50 lf.vessel(i).L50], ...
+        get(gca,'YLim'), 'k', 'LineWidth', 2)
+    textLoc(lf.vessel(i).vessel, 'NorthEast');
     %textLoc(['N=' num2str(lf.vessel(i).numStations)], 'NorthEast');
     if i >= 5
         xlabel('Length (mm)')
@@ -290,8 +303,6 @@ end
 ifile = fullfile(resultsDir, 'Trawls - lf per vessel.png');
 print(ifile, '-dpng', '-r300')
 crop_image(ifile)
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function lf = load_lf_data(dataDir)
@@ -322,7 +333,7 @@ function lf = load_lf_data(dataDir)
             stnType = 'TID';
         end
         
-        lf(k) = struct('vessel', 'RSS', 'station', stations(i), ...
+        lf(k) = struct('vessel', 'RRS', 'station', stations(i), ...
             'lengths', c.Length(j), ...
             'lat', s.Latitude(kk), 'lon', s.Longitude(kk), ...
             'timestamp', datenum(s.timestamp(kk)), ...
