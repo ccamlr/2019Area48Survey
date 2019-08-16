@@ -115,14 +115,18 @@ rmpath(SDWBAdir)
 figure(2)
 clf
 
-load SDWBA-TS-2019-038kHz.mat
+do_define_directories
+
+ts = readtable(fullfile(resultsDir, 'sdwba_ts.csv'));
+
+load(fullfile(resultsDir, 'SDWBA-TS-2019-038kHz.mat'), 'krill_ts')
 plot((10:67), 10*log10([krill_ts.ts.sigma_avg]) - ts.ts038')
 hold on
 
-load SDWBA-TS-2019-120kHz.mat
+load(fullfile(resultsDir, 'SDWBA-TS-2019-120kHz.mat'), 'krill_ts')
 plot((10:67), 10*log10([krill_ts.ts.sigma_avg]) - ts.ts120')
 
-load SDWBA-TS-2019-200kHz.mat
+load(fullfile(resultsDir, 'SDWBA-TS-2019-200kHz.mat'), 'krill_ts')
 plot((10:67), 10*log10([krill_ts.ts.sigma_avg]) - ts.ts200')
 
 xlabel('Length (mm)')
