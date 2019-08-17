@@ -3,6 +3,9 @@ function results = calcBiomass(nasc, strata, surveys)
     % Now calculate biomass density for each transect, stratum and finally
     % survey. This follows the equations in EMM-16/38 section 9, with some
     % corrections.
+    
+    % We are given a list of strata to work with, but sometimes we have no
+    % data for some of the strata, so deal with that where necessary.
 
     for k = 1:length(strata) % loop over all strata
         results.strata(k).name = strata(k).name;
@@ -23,10 +26,16 @@ function results = calcBiomass(nasc, strata, surveys)
         
         % Extract the per transect data from the results structure for
         % convenience into variables with the same names as per EMM-16/38.
-        L_j = [results.strata(k).transect.length]; % [nmi]
-        rho_j = [results.strata(k).transect.krillDensity]; % [g/m^2]
-        N_k = length(transects); % [1]
-        
+        if isempty(results.strata(k).transect) % no data for this stratum
+            L_j = 0;
+            rho_j = NaN;
+            N_k = 0;
+        else
+            L_j = [results.strata(k).transect.length]; % [nmi]
+            rho_j = [results.strata(k).transect.krillDensity]; % [g/m^2]
+            N_k = length(transects); % [1]
+        end
+      
         % Compute normalized transect weighting factors
         w_j = L_j / mean(L_j); % equation 11 [1]
         

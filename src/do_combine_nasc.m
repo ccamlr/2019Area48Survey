@@ -129,50 +129,11 @@ for i = 1:length(vessels)
             end
             
             % add transect and stratum id to the data
-            t = split(d(j).name, '_');
-            t = string(t{2});
+            t = split(d(j).name, '_');            
+            [st, tr] = sortOutNaming(string(t{2}));
             
-            if startsWith(t, "AP")
-                n.Stratum = repmat("AP", size(n.NASC, 1), 1); % Antarctic Pennisula
-                n.Transect = repmat(extractAfter(t,2), size(n.NASC, 1), 1);
-            elseif startsWith(t, "ELE") % AMLR stratum
-                n.Stratum = repmat("Elephant", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,3), size(n.NASC, 1), 1);
-            elseif startsWith(t, "WEST")  % AMLR stratum
-                n.Stratum = repmat("West", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,4), size(n.NASC, 1), 1);
-            elseif startsWith(t, "SSI")
-                n.Stratum = repmat("SSI", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,3), size(n.NASC, 1), 1);
-            elseif startsWith(t, "SSA") || startsWith(t, "SSB") || startsWith(t, "SSC")
-                n.Stratum = repmat("ESS", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,2), size(n.NASC, 1), 1);
-            elseif startsWith(t, "SS") % Scotia Sea. Must come after SSI
-                n.Stratum = repmat("SS", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,2), size(n.NASC, 1), 1);
-            elseif startsWith(t, "SG")
-                n.Stratum = repmat("SG", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,2), size(n.NASC, 1), 1);
-            elseif startsWith(t, "SOF") % South Orkneys Fixed
-                n.Stratum = repmat("SOF", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,3), size(n.NASC, 1), 1);
-            elseif startsWith(t, "SOC") % South Orkney Concentrated
-                n.Stratum = repmat("SOC", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,3), size(n.NASC, 1), 1);
-            elseif startsWith(t, "SO") % South Okrney Islands. Must come after SOF and SOC
-                n.Stratum = repmat("SOI", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,2), size(n.NASC, 1), 1);
-            elseif startsWith(t, "SA483")
-                n.Stratum = repmat("SA483", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,6), size(n.NASC, 1), 1);
-            elseif startsWith(t, "Sand")
-                n.Stratum = repmat("Sand", size(n.NASC, 1), 1);
-                n.Transect = repmat(extractAfter(t,4), size(n.NASC, 1), 1);
-            else
-                n.Stratum = repmat("Unknown", size(n.NASC, 1), 1);
-                n.Transect = repmat("Unknown", size(n.NASC, 1), 1);
-            end
-            
+            n.Stratum = repmat(st, size(n.NASC, 1), 1);
+            n.Transect = repmat(tr, size(n.NASC, 1), 1);
         end
         
         % add vessel name to the data        

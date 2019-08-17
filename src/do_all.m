@@ -27,9 +27,13 @@ do_calculate_ts
 %% Calculate the biomass
 do_estimate_biomass
 
+%% Work up the data we have where the 3-freq dB-difference method is pissible
+do_db_difference
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Show the biomass results 
 do_define_directories
-load(fullfile(resultsDir, 'Final results'), 'results')
+load(fullfile(resultsDir, 'Final results - swarm'), 'results')
 
 % Show the per strata results
 disp('Results per strata:')
@@ -61,3 +65,60 @@ for i = 1:height(results.biomass_survey)
         jf.format(round(r.variance/1e9)), ...
         r.CV)
 end
+
+%% Show the comparison of KPH swarm verses dB-difference krill classification
+do_define_directories
+load(fullfile(resultsDir, 'Final results - swarm'), 'results')
+results_swarm = results;
+load(fullfile(resultsDir, 'Final results  - dB difference - KPH'), 'results')
+results_dBdiff = results;
+
+% Mainly interested in the density per transect, so do a comparison table
+% of that.
+clear transect
+k = 1;
+for i = 1:length(results_dBdiff.strata)
+    if ~isempty(results_dBdiff.strata(i).transect)
+        for j = 1:length(results_dBdiff.strata(i).transect)
+            name = string(results_dBdiff.strata(i).name) + results_dBdiff.strata(i).transect(j).name;
+            transect.name(k,1) = name;
+            transect.rho_dB(k,1) =  results_dBdiff.strata(i).transect(j).krillDensity;
+            transect.rho_swarm(k,1) = results_swarm.strata(i).transect(j).krillDensity;
+            k = k + 1;
+        end
+    end
+end
+transect = struct2table(transect);
+transect.prop = transect.rho_dB ./ transect.rho_swarm;
+
+% for copy/pasting into Word, etc
+for i = 1:height(transect)
+    disp(transect.name(i) + ' ' + num2str(transect.rho_swarm(i), '%.1f') + ' ' ...
+        + num2str(transect.prop(i), '%.2f'))
+end
+
+% A plot of the data with regression
+mdl = fitlm(transect.rho_swarm, transect.rho_dB);
+% avoids Stats toolbox
+% p = polyfit(transect.rho_swarm, transect.rho_dB, 1) 
+eqn = {"\rho_{dB} = " + num2str(mdl.Coefficients.Estimate(2), '%.2f') + ...
+    "\rho_{swarm} + " + num2str(mdl.Coefficients.Estimate(1), '%.2f')  ...
+    "r^2 = " + num2str(mdl.Rsquared.Adjusted, '%.3f')};
+m = max([transect.rho_swarm; transect.rho_dB]);
+
+figure(1)
+clf
+plot(transect.rho_swarm, transect.rho_dB, 'ko', 'MarkerFaceColor', 'k')
+hold on
+plot([0 m],  mdl.Coefficients.Estimate(2) * [0 m] + mdl.Coefficients.Estimate(1), 'k', 'LineWidth', 1.5)
+grid
+xlabel('Areal density, swarms (g m^{-2})')
+ylabel('Areal density, dB-difference (g m^{-2})')
+
+set(gca, 'XLim', [0 m], 'YLim', [0 m])
+textLoc(eqn, 'NorthWest');
+
+ifile = fullfile(resultsDir, 'Swarms verses dB-diff - regression.png');
+print(ifile, '-r300', '-dpng')
+crop_image(ifile)
+

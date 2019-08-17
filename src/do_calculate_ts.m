@@ -110,24 +110,36 @@ rmpath(SDWBAdir)
 
 %%
 % and a little comparison between what is calculated above and what is in
-% Table 2 of WG-EMM-16/38
+% Table 2 of WG-EMM-16/38 (and is also in the file
+% ASAM_TS_krill_length_values_alt_fin.mat, which is stored in the results
+% directory)
 
 figure(2)
 clf
 
 do_define_directories
 
-ts = readtable(fullfile(resultsDir, 'sdwba_ts.csv'));
+clear ts
+%ts = readtable(fullfile(resultsDir, 'sdwba_ts.csv'));
+load(fullfile(resultsDir, 'ASAM_TS_krill_length_values_alt_fin'), 'T_TS', 'krill_ls')
+% and make the data structure a little easier to understand...
+ts.ts038 = T_TS(1,:)';
+ts.ts120 = T_TS(2,:)';
+ts.ts200 = T_TS(3,:)';
+ts.length = krill_ls';
+% That dataset goes to 65 mm, but we have krill to 67mm, so deal with that
+% in the plots
+l = 10:67;
 
 load(fullfile(resultsDir, 'SDWBA-TS-2019-038kHz.mat'), 'krill_ts')
-plot((10:67), 10*log10([krill_ts.ts.sigma_avg]) - ts.ts038')
+plot(l, 10*log10([krill_ts.ts.sigma_avg]') - [ts.ts038; NaN; NaN])
 hold on
 
 load(fullfile(resultsDir, 'SDWBA-TS-2019-120kHz.mat'), 'krill_ts')
-plot((10:67), 10*log10([krill_ts.ts.sigma_avg]) - ts.ts120')
+plot(l, 10*log10([krill_ts.ts.sigma_avg]') - [ts.ts120; NaN; NaN])
 
 load(fullfile(resultsDir, 'SDWBA-TS-2019-200kHz.mat'), 'krill_ts')
-plot((10:67), 10*log10([krill_ts.ts.sigma_avg]) - ts.ts200')
+plot(l, 10*log10([krill_ts.ts.sigma_avg]') - [ts.ts200; NaN; NaN])
 
 xlabel('Length (mm)')
 ylabel('\Delta TS of krill (dB re 1m^2)')

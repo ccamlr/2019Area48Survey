@@ -52,52 +52,12 @@ for i = 1:length(tt)
     
     % work out the stratum and transect
     t = split(event, ' ');
-    t = string(t{3});
-    
-    if startsWith(t, "AP")
-        stratum = "AP";
-        transect = extractAfter(t,2);
-    elseif startsWith(t, "ELE") % AMLR stratum
-        stratum = "Elephant";
-        transect = extractAfter(t,3);
-    elseif startsWith(t, "WEST")  % AMLR stratum
-        stratum = "West";
-        transect = extractAfter(t,4);
-    elseif startsWith(t, "SSI")
-        stratum = "SSI";
-        transect = extractAfter(t,3);
-    elseif startsWith(t, "SSA") || startsWith(t, "SSB") || startsWith(t, "SSC")
-        stratum = "ESS";
-        transect = extractAfter(t,2);
-    elseif startsWith(t, "SS") % Scotia Sea. Must come after SSI
-        stratum = "SS";
-        transect = extractAfter(t,2);
-    elseif startsWith(t, "SG")
-        stratum = "SG";
-        transect = extractAfter(t,2);
-    elseif startsWith(t, "SOF") % South Orkneys Fixed
-        stratum = "SOF";
-        transect = extractAfter(t,3);
-    elseif startsWith(t, "SOC") % South Orkney Concentrated
-        stratum = "SOC";
-        transect = extractAfter(t,3);
-    elseif startsWith(t, "SO") % South Okrney Islands. Must come after SOF and SOC
-        stratum = "SOI";
-        transect = extractAfter;
-    elseif startsWith(t, "SA483")
-        stratum = "SA483";
-        transect = extractAfter(t,6);
-    elseif startsWith(t, "Sand")
-        stratum = "Sand";
-        transect = extractAfter(t,4);
-    else
-        stratum = "Unknown";
-        transect = "Unknown";
-    end
-    
+    [stratum, transect] = sortOutNaming(string(t{3}));
+            
     % Find data within the current time period
     j = find(nasc.Ping_timestamp >= onTime & nasc.Ping_timestamp <= offTime);
     onTransect = [onTransect; j];
+    
     % Make up transect and strata for each nasc value in the current
     % time period
     transectNames = [transectNames; repmat(transect, length(j), 1)];
@@ -117,11 +77,17 @@ nasc.f200 = nasc.f200(onTransect,:);
 
 
 % Calculate the dB difference windows. Results are almost identical to
-% Table 3 in EMM-16/38. Small differences appear to be due to rounding in
-% that table to 1 decimal place and also that the TS values in the
+% Table 3 in EMM-16/38. Small differences appear to be due to the rounding in
+% that table (to 1 decimal place) and also that the TS values in the
 % sdwba_ts.csv file (which come from Table 2 in the same document) are only
 % to 2 decimal places. 
-ts = readtable(fullfile(resultsDir, 'sdwba_ts.csv'));
+%ts = readtable(fullfile(resultsDir, 'sdwba_ts.csv'));
+load(fullfile(resultsDir, 'ASAM_TS_krill_length_values_alt_fin'), 'T_TS', 'krill_ls')
+ts.ts038 = T_TS(1,:)';
+ts.ts120 = T_TS(2,:)';
+ts.ts200 = T_TS(3,:)';
+ts.length = krill_ls';
+
 k = 1;
 for len_min = (10:10:50)
     for len_max = len_min+10:10:60
@@ -150,7 +116,7 @@ load(fullfile(resultsDir, 'Trawls - data'), 'lf_raw', 'lf');
 % Use the full set of trawls, not just those done by KPH. This makes things
 % more comparable between analyses.
 
-% Do both the per-stratum and clusters.
+% Work out the dB difference windows for both the per-stratum and clusters length distributions.
 for field = ["cluster", "strata"]
     for i = 1:length(lf.(field))
         toRemove = round(0.025 * lf.(field)(i).numLengths); % from each end
@@ -175,8 +141,8 @@ nasc.NASC_per_stratum = nan(size(nasc.f120));
 %nasc.NASC_per_cluster = nan(size(nasc.f120));
 
 % the dB differences
-diff120_038 = nasc.f120-nasc.f038;
-diff200_120 = nasc.f200-nasc.f120;
+diff120_038 = 10*log10(nasc.f120)-10*log10(nasc.f038);
+diff200_120 = 10*log10(nasc.f200)-10*log10(nasc.f120);
 
 s = unique(nasc.Stratum);
 for i = 1:length(s)
@@ -194,9 +160,10 @@ for i = 1:length(s)
     end
 end
 
-% and then collapse the depth axis and integrate into 1 n.mi horizontal
-% bins (as per CCAMLR procedure)
+% and then collapse the depth axis and resample into 1 n.mi horizontal
+% bins (as per CCAMLR procedure) - it currently in  m bins
 nasc.NASC_per_stratum = nansum(nasc.NASC_per_stratum, 2);
+
 
 % Format for the do_estimate_biomass script
 nasc = rmfield(nasc, {'f038' 'f120' 'f200'});
@@ -212,25 +179,25 @@ end
 % and save the combined dataset
 save(fullfile(resultsDir, 'NASC - data - dB difference - KPH'), 'nasc')
 
-
 % and do some comparison plots of NASC
-load(fullfile(resultsDir, 'NASC - data - dB difference - KPH'), 'nasc')
-nasc_diff = nasc;
-load(fullfile(resultsDir, 'NASC - data'), 'nasc')
+% load(fullfile(resultsDir, 'NASC - data - dB difference - KPH'), 'nasc')
+% nasc_diff = nasc;
+% load(fullfile(resultsDir, 'NASC - data'), 'nasc')
+% 
+% s = unique(nasc_diff.Stratum+nasc_diff.Transect);
 
-s = unique(nasc_diff.Stratum+nasc_diff.Transect);
-
-figure(1)
-clf
-for i = 1:length(s)
-    i_diff = find(nasc_diff.Stratum + nasc_diff.Transect == s(i));
-    i_swarm = find(nasc.Stratum + nasc.Transect == s(i));
-    plot(nasc.Latitude(i_swarm), nasc.NASC(i_swarm), '.-')
-    hold on
-    plot(nasc_diff.Latitude(i_diff), nasc_diff.NASC_per_stratum(i_diff), '.-')
-    pause
-    clf
-end
+% figure(1)
+% clf
+% for i = 1:length(s)
+%     i_diff = find(nasc_diff.Stratum + nasc_diff.Transect == s(i) & ...
+%     nasc_diff.Vessel == "KPH");
+%     i_swarm = find(nasc.Stratum + nasc.Transect == s(i) & nasc.Vessel == "KPH");
+%     plot(nasc.Latitude(i_swarm), nasc.NASC(i_swarm), '.-')
+%     hold on
+%     plot(nasc_diff.Latitude(i_diff), nasc_diff.NASC_per_stratum(i_diff), '.-')
+%     pause
+%     clf
+% end
 
 
 
