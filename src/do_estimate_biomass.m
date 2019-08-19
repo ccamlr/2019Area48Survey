@@ -42,8 +42,7 @@ save(fullfile(resultsDir, 'Final results - swarm'), 'results')
 do_areal_density_maps(results.nasc, strata, 'Krill density', resultsDir)
 do_areal_density_maps(results.nasc_day, strata, 'Day krill density', resultsDir)
 
-% Calculate a 'biomass' from the dB difference data from just KPH, but
-% we're really only interested in the transect density.
+% Calculate a 'biomass' from the dB difference data from just KPH.
 load(fullfile(resultsDir, 'NASC - data - dB difference - KPH'), 'nasc')
 nasc.NASC = nasc.NASC_per_stratum;
 results = runBiomass(nasc, lf, strata_area, surveys);

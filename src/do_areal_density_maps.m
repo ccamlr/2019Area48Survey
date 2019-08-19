@@ -78,6 +78,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     crop_image(ifile)
 
     %%%%%%%%%%%
+    % AMLR strata and transects
     figure(4)
     clf
 
@@ -89,6 +90,14 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     for i = 1:length(s)
         j = find(nasc.Stratum == s(i));
         m_scatter(nasc.Longitude(j), nasc.Latitude(j), nasc.rho(j)/maxRho*maxSize+1, 'filled', 'o');
+
+        % Transect label at northernmost point of each transect
+%         t = unique(nasc.Transect(j));
+%         for k = 1:length(t)
+%             j = find(nasc.Stratum == s(i) & nasc.Transect == t(k));
+%             [~, n_i] = max(nasc.Latitude(j));
+%             m_text(nasc.Longitude(j(n_i)), nasc.Latitude(j(n_i)), nasc.Transect(j(n_i)));
+%         end
     end
     plot_standard_map_rho_legend(legendScatterSizes, maxRho, maxSize)
 
@@ -97,6 +106,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     crop_image(ifile)
 
     %%%%%%%%%%%
+    % CCAMLR 2000 strata and transects
     figure(5)
     clf
 
@@ -116,6 +126,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     crop_image(ifile)
 
     %%%%%%%%%%%
+    % Zoom on the South Orkney strata and transects
     figure(6)
     clf
 

@@ -73,8 +73,8 @@ results_swarm = results;
 load(fullfile(resultsDir, 'Final results  - dB difference - KPH'), 'results')
 results_dBdiff = results;
 
-% Mainly interested in the density per transect, so do a comparison table
-% of that.
+% Mainly interested in the density per transect, and per-strata biomass, so
+% do comparison tables of that.
 clear transect
 k = 1;
 for i = 1:length(results_dBdiff.strata)
@@ -84,6 +84,7 @@ for i = 1:length(results_dBdiff.strata)
             transect.name(k,1) = name;
             transect.rho_dB(k,1) =  results_dBdiff.strata(i).transect(j).krillDensity;
             transect.rho_swarm(k,1) = results_swarm.strata(i).transect(j).krillDensity;
+            transect.length(k,1) = results_swarm.strata(i).transect(j).length;
             k = k + 1;
         end
     end
@@ -91,10 +92,35 @@ end
 transect = struct2table(transect);
 transect.prop = transect.rho_dB ./ transect.rho_swarm;
 
+% Per-stratum comparison table
+clear strata
+k = 1;
+for i = 1:length(results_dBdiff.strata)
+    if ~isnan(results_dBdiff.strata(i).meanDensity)
+        strata.name(k,1) = string(results_dBdiff.strata(i).name);
+        strata.rho_dB(k,1) = results_dBdiff.strata(i).meanDensity;
+        strata.rho_swarm(k,1) = results_swarm.strata(i).meanDensity;
+        strata.area(k,1) = results_dBdiff.strata(i).area;
+        k = k + 1;
+    end
+end
+strata = struct2table(strata);
+strata.prop = strata.rho_dB ./ strata.rho_swarm;
+
+
 % for copy/pasting into Word, etc
+disp('Per-transect densities')
 for i = 1:height(transect)
     disp(transect.name(i) + ' ' + num2str(transect.rho_swarm(i), '%.1f') + ' ' ...
-        + num2str(transect.prop(i), '%.2f'))
+        + num2str(transect.prop(i), '%.2f') + ' ' ...
+        + num2str(transect.length(i), '%.f'))
+end
+
+disp('Per-stratum biomass comparison')
+for i = 1:height(strata)
+    disp(strata.name(i) + ' ' + num2str(strata.rho_swarm(i), '%.1f') + ' ' ...
+        + num2str(strata.prop(i), '%.1f') + ' ' ...
+        + num2str(strata.area(i), '%.f'))    
 end
 
 % A plot of the data with regression

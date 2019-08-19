@@ -47,8 +47,8 @@ for i = 1:length(vessels)
             % these extra transects.
             transects = {
                 '20190205T102300', '20190205T153100', "Elephant", "02";
-                '20190205T172300', '20190206T083050', "Elephant", "01";
-                '20190206T083726', '20190206T164000', "Joinville", "01";
+                '20190205T172300', '20190206T090049', "Elephant", "01";
+                '20190206T092050', '20190206T164000', "Joinville", "01";
                 '20190206T192400', '20190207T020500', "Joinville", "02";
                 '20190207T052600', '20190207T101316', "Joinville", "03";
                 '20190207T110955', '20190207T162900', "Bransfield", "01";
@@ -288,23 +288,74 @@ if false % these plots have been moved to showing rho, and are now down in the d
     print(ifile, '-dpng','-r300')
     crop_image(ifile)
     
-    % Map of transect data and their names
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % Map of transect names. Bit complicated with lots of subplots
     figure(6)
     clf
-    plot_standard_map(strata)
     
-    transects = unique(nasc.Stratum + nasc.Transect);
-    
-    for i = 1:length(transects)
-        k = find(nasc.Stratum+nasc.Transect == transects(i));
-        m_plot(nasc.Longitude(k), nasc.Latitude(k), 'k.');
-        hold on
-        % and a label at the northernmost part
-        [~, n_i] = max(nasc.Latitude(k));
-        m_text(nasc.Longitude(k(n_i)), nasc.Latitude(k(n_i)), transects(i))
-    end
-    
+    % Wide area strata
+    subplot1(2,2, 'Gap', [0.05 0.05])
+    subplot1(1)
+    s = ["SS" "AP" "ESS"];
+    plot_standard_map(strata, 'strata', s, 'showStrataNames', true, ...
+        'coastDetail', 'low')
+    plot_transect_names(nasc, s)
     m_grid('box', 'on')
+   
+    % South Shetland Islands
+    %     subplot(2,2,2)
+    %     s = ["SSI"];
+    %     plot_standard_map(strata, 'strata', s, 'showStrataNames', true, ...
+    %         'coastDetail', 'low', 'centrePoint', [-58.2 -62], ...
+    %         'radius', 4)
+    %     plot_transect_names(nasc, s)
+    %     m_grid('box', 'on')
+
+    % AMLR transects
+    %     subplot(3,3,6)
+    %     s = ["West" "Elephant" "Joinville" "Bransfield"];
+    %     plot_standard_map(strata, 'strata', s, 'showStrataNames', true, ...
+    %         'coastDetail', 'low', 'centrePoint', [-58.2 -62], ...
+    %         'radius', 4)
+    %     plot_transect_names(nasc, s)
+    %     m_grid('box', 'on')
+    
+    % South Orkney #1
+    
+    subplot1(2)
+    s = ["SOF"];
+    plot_standard_map(strata, 'strata', s, 'showStrataNames', true, ...
+        'coastDetail', 'high', 'centrePoint', [-45.5 -60.5], ...
+        'radius', 2.5)
+    plot_transect_names(nasc, s)
+    m_grid('box', 'on')
+    
+    % South Orkney #2
+    subplot1(3)
+    s = ["SOC"];
+    plot_standard_map(strata, 'strata', s, 'showStrataNames', true, ...
+        'coastDetail', 'fine', 'centrePoint', [-46.5 -60.25], ...
+        'radius', .8)
+    plot_transect_names(nasc, s)
+    m_grid('box', 'on')
+    
+    % South Georgia
+    subplot1(4)
+    s = ["SG"];
+    plot_standard_map(strata, 'strata', s, 'showStrataNames', true, ...
+        'coastDetail', 'high', 'centrePoint', [-36.3 -54], ...
+        'radius', 2)
+    plot_transect_names(nasc, s)
+    m_grid('box', 'on')
+    
+    % South Sandwich Islands
+%     subplot(3,3,7)
+%     s = ["ESS" "Sand"];
+%     plot_standard_map(strata, 'strata', s, 'showStrataNames', true, ...
+%         'coastDetail', 'low', 'centrePoint', [-26 -57], ...
+%         'radius', 5)
+%     plot_transect_names(nasc, s)
+%     m_grid('box', 'on')
     
     ifile = fullfile(resultsDir, 'Transects - as done and labelled.png');
     print(ifile, '-dpng','-r300')
