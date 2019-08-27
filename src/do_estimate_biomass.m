@@ -42,6 +42,16 @@ save(fullfile(resultsDir, 'Final results - swarm'), 'results')
 do_areal_density_maps(results.nasc, strata, 'Krill density', resultsDir)
 do_areal_density_maps(results.nasc_day, strata, 'Day krill density', resultsDir)
 
+% Day/night differences
+disp("Proportion of NASC data collected during the day: " ...
+    + num2str(height(results.nasc_day)/height(results.nasc), '%.2f'))
+results.biomass_strata(:,{'name' 'dayRatio'})
+
+% Show all of the ratios, for each stratum and survey
+format bank
+t = [results.biomass_strata(:,{'name' 'dayRatio'}); results.biomass_survey(:,{'name' 'dayRatio'})]
+format short
+
 % Calculate a 'biomass' from the dB difference data from just KPH.
 load(fullfile(resultsDir, 'NASC - data - dB difference - KPH'), 'nasc')
 nasc.NASC = nasc.NASC_per_stratum;
