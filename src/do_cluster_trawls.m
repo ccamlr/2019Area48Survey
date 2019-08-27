@@ -194,6 +194,27 @@ save(fullfile(resultsDir, 'Trawls - data'), 'lf_raw', 'lf', 'aggloCoeff');
 writetable(tor, fullfile(resultsDir, 'Trawls - for Tor.csv'), ...
     'FileType', 'text', 'WriteRowNames', true);
 
+% and save in a format for Keith Reid
+lf_keith = lf_raw;
+
+for i = 1:length(lf_raw)
+    if isnan(lf_raw(i).timestamp)
+        lf_keith(i).timestamp = 0;
+    end
+end
+% then write out a flattened file
+
+fid = fopen(fullfile(resultsDir, 'Trawls - for Keith.csv'), 'w');
+fprintf(fid, 'vessel,station code,year,month,day,start time,lat,lon,length,total\n');
+for i = 1:length(lf_keith)
+    header = sprintf('%s,%s,%s,%f,%f', lf_keith(i).vessel, num2str(lf_keith(i).station), ...
+        datestr(lf_keith(i).timestamp, 'yyyy,mm,dd,HHMM'), lf_keith(i).lat, lf_keith(i).lon);
+    N = histcounts(lf_keith(i).lengths, lengths);
+    for j = 1:length(N)
+        fprintf(fid, '%s,%d,%d\n', header, lengths(j), N(j));
+    end
+end
+fclose(fid);
 
 %%%%%%%%%%%%%%%%%%%%%%
 % Do some plots
