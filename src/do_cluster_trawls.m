@@ -391,23 +391,23 @@ function lf = load_lf_data(dataDir)
 
     % Fu Rong Hai
     disp('Loading Fu Rong Hai data')
-    c = readtable(fullfile(dataDir, 'FRH.xlsx'));
-    s = readtable(fullfile(dataDir,'FRH_station_info.csv'));
+    c = readtable(fullfile(dataDir, 'FRH.xlsx')); % catch info
+    s = readtable(fullfile(dataDir,'FRH_station_info2.csv')); % station info
     
-    stations = unique(c.station_num);
+    stations = unique(c.Station);
     k = length(lf) + 1;
-    for i = 1:length(stations)
-        j = find(c.station_num == stations(i));
+    for i = 1:length(stations) % loop over stations in catch info
+        j = find(strcmp(c.Station, stations(i))); % all lines in catch info for current station
         
-        kk = find(strcmp(c.SYNOPTIC_ST(j(1)), s.station));
+        kk = find(strcmp(c.Station(j(1)), s.station)); % station info for the current station
         if length(kk) ~= 1
            warning('No single station info found')
         end
         
         lf(k) = struct('vessel', 'FRH', 'station', c.SYNOPTIC_ST(j(1)), ...
             'lengths', c.Length(j), ...
-            'lat', s.lat(kk), 'lon', s.lon(kk), ...
-            'timestamp', NaN, ...
+            'lat', s.latitude(kk), 'lon', s.longitude(kk), ...
+            'timestamp', datenum(s.timestamp(kk)), ...
              'type', 'STN');
         k = k + 1;
     end
