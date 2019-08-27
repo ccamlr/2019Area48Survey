@@ -1,0 +1,83 @@
+#========================================================================================#
+#                ECHOVIEW CALIBRATION SUPPLEMENT (.ECS) FILE (SimradEx80)                #
+#                                07.05.2019 11:04:50.4760                                #
+#========================================================================================#
+#       +----------+   +-----------+   +----------+   +-----------+   +----------+       #
+#       | Default  |-->| Data File |-->| Fileset  |-->| SourceCal |-->| LocalCal |       #
+#       | Settings |   | Settings  |   | Settings |   | Settings  |   | Settings |       #
+#       +----------+   +-----------+   +----------+   +-----------+   +----------+       #
+# - Settings to the right override those to their left.                                  #
+# - See the Help file page "About calibration".                                          #
+#========================================================================================#
+
+Version 1.00
+
+
+#========================================================================================#
+#                                    FILESET SETTINGS                                    #
+#========================================================================================#
+
+SoundSpeed = 1456 # (meters per second) [1400.00..1700.00]
+# TvgRangeCorrection = # an enumeration tag or an integer [0..9]
+# TvgRangeCorrectionOffset = # (samples) [-10000.00..10000.00]
+
+
+#========================================================================================#
+#                                   SOURCECAL SETTINGS                                   #
+#========================================================================================#
+
+SourceCal T1
+AbsorptionCoefficient = 0.0104 # (decibels per meter) [0.0000000..100.0000000]
+    # AbsorptionDepth = 100.000 # (meters) [0.000..10000.000]
+    # Acidity = 8.000 # (pH) [1.000..14.000]
+    # EffectivePulseLength = 0.655 # (milliseconds) [0.001..50.000]
+EK60SaCorrection = -0.0200 # (decibels) [-99.9900..99.9900]
+Frequency = 38.00 # (kilohertz) [0.01..10000.00]
+MajorAxis3dbBeamAngle = 6.97 # (degrees) [0.00..359.99]
+MajorAxisAngleOffset = -0.09 # (degrees) [-9.99..9.99]
+    # MajorAxisAngleSensitivity = 23.000000 # [0.100000..100.000000]
+MinorAxis3dbBeamAngle = 7.79 # (degrees) [0.00..359.99]
+MinorAxisAngleOffset = 0.03 # (degrees) [-9.99..9.99]
+    # MinorAxisAngleSensitivity = 23.000000 # [0.100000..100.000000]
+    # NumberOfTransducerSegments = 4 # [1..4]
+    # Salinity = 34.000 # (parts per thousand) [0.000..50.000]
+    # SamplingFrequency = 25.0000000 # (kilohertz) [0.0100000..1000.0000000]
+    # SoundSpeed = 1456.00 # (meters per second) [1400.00..1700.00]
+    # Temperature = 1.000 # (degrees celsius) [-10.000..100.000]
+    # TransceiverImpedance = 5400.0 # (ohms) [0.0..1000000.0]
+TransducerGain = 27.3000 # (decibels) [1.0000..99.0000]
+    # TransmittedPower = 2000.00000 # (watts) [1.00000..30000.00000]
+    # TransmittedPulseLength = 1.024 # (milliseconds) [0.001..50.000]
+    # TvgRangeCorrection = SimradEK80 # an enumeration tag or an integer [0..9]
+    # TwoWayBeamAngle = -20.700000 # (decibels re 1 steradian) [-99.000000..-1.000000]
+
+SourceCal T2
+AbsorptionCoefficient = 0.0279 # (decibels per meter) [0.0000000..100.0000000]
+    # AbsorptionDepth = 100.000 # (meters) [0.000..10000.000]
+    # Acidity = 8.000 # (pH) [1.000..14.000]
+    # EffectivePulseLength = 0.924 # (milliseconds) [0.001..50.000]
+EK60SaCorrection = -0.0100 # (decibels) [-99.9900..99.9900]
+Frequency = 120.00 # (kilohertz) [0.01..10000.00]
+MajorAxis3dbBeamAngle = 6.59 # (degrees) [0.00..359.99]
+MajorAxisAngleOffset = -0.03 # (degrees) [-9.99..9.99]
+    # MajorAxisAngleSensitivity = 23.000000 # [0.100000..100.000000]
+MinorAxis3dbBeamAngle = 6.65 # (degrees) [0.00..359.99]
+MinorAxisAngleOffset = -0.01 # (degrees) [-9.99..9.99]
+    # MinorAxisAngleSensitivity = 23.000000 # [0.100000..100.000000]
+    # NumberOfTransducerSegments = 4 # [1..4]
+    # Salinity = 34.000 # (parts per thousand) [0.000..50.000]
+    # SamplingFrequency = 25.0000000 # (kilohertz) [0.0100000..1000.0000000]
+    # SoundSpeed = 1456.00 # (meters per second) [1400.00..1700.00]
+    # Temperature = 1.000 # (degrees celsius) [-10.000..100.000]
+    # TransceiverImpedance = 5400.0 # (ohms) [0.0..1000000.0]
+TransducerGain = 26.8500 # (decibels) [1.0000..99.0000]
+    # TransmittedPower = 250.00000 # (watts) [1.00000..30000.00000]
+    # TransmittedPulseLength = 1.024 # (milliseconds) [0.001..50.000]
+    # TvgRangeCorrection = SimradEK80 # an enumeration tag or an integer [0..9]
+    # TwoWayBeamAngle = -20.700000 # (decibels re 1 steradian) [-99.000000..-1.000000]
+
+
+#========================================================================================#
+#                                    LOCALCAL SETTINGS                                   #
+#========================================================================================#
+
