@@ -347,9 +347,9 @@ function lf = load_lf_data(dataDir)
     
     % RRS Discovery
     disp('Loading RRS Discovery data')
-    c = readtable(fullfile(dataDir, 'RRS.xlsx'));
+    c = readtable(fullfile(dataDir, 'RRS.xlsx')); 
     s = readtable(fullfile(dataDir, 'RRS_station_info.csv'));
-
+    
     stations = unique(s.EventNo);
     k = length(lf);
     for i = 1:length(stations)
