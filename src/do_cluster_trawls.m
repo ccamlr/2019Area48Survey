@@ -402,7 +402,7 @@ function lf = load_lf_data(dataDir)
     % Fu Rong Hai
     disp('Loading Fu Rong Hai data')
     c = readtable(fullfile(dataDir, 'FRH.xlsx')); % catch info
-    s = readtable(fullfile(dataDir,'FRH_station_info2.csv')); % station info
+    s = readtable(fullfile(dataDir,'FRH_station_info.csv')); % station info
     
     stations = unique(c.Station);
     k = length(lf) + 1;
