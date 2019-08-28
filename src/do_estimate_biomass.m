@@ -39,6 +39,8 @@ strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey stra
 load(fullfile(resultsDir, 'NASC - data'), 'nasc')
 results = runBiomass(nasc, lf, strata_area, surveys);
 save(fullfile(resultsDir, 'Final results - swarm'), 'results')
+writetable(results.nasc, fullfile(resultsDir, 'NASC for cross-checking.csv'))
+
 do_areal_density_maps(results.nasc, strata, 'Krill density', resultsDir)
 do_areal_density_maps(results.nasc_day, strata, 'Day krill density', resultsDir)
 
