@@ -312,13 +312,13 @@ if false % these plots have been moved to showing rho, and are now down in the d
     %     m_grid('box', 'on')
 
     % AMLR transects
-    %     subplot(3,3,6)
-    %     s = ["West" "Elephant" "Joinville" "Bransfield"];
-    %     plot_standard_map(strata, 'strata', s, 'showStrataNames', true, ...
-    %         'coastDetail', 'low', 'centrePoint', [-58.2 -62], ...
-    %         'radius', 4)
-    %     plot_transect_names(nasc, s)
-    %     m_grid('box', 'on')
+     %    subplot(3,3,6)
+         s = ["West" "Elephant" "Joinville" "Bransfield"];
+         plot_standard_map(strata, 'strata', s, 'showStrataNames', true, ...
+             'coastDetail', 'low', 'centrePoint', [-58.2 -62], ...
+             'radius', 4)
+         plot_transect_names(nasc, s)
+         m_grid('box', 'on')
     
     % South Orkney #1
     

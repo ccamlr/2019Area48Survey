@@ -161,6 +161,16 @@ for i = 1:length(strata.features)
         'lengths', ll);
 end
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Do the lf per the 3 main CCAMLR 2000 strata, as discussed in SG-ASAM-2019
+% Load survey strata
+strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey strata.geojson')));
+
+% and filter on the time that the strata were surveyed
+large_strata = ["SS" "AP" "ESS"];
+
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Output the results in various ways:
 
