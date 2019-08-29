@@ -49,7 +49,7 @@ disp('strata for pasting:')
 
 jf = java.text.DecimalFormat; % formatting with thousands commas
 for i = 1:height(results.biomass_strata)
-    r = results.biomass_strata(i,2:5);
+    r = results.biomass_strata(1,{'area' 'meanDensity' 'biomass' 'varianceComponent'});
     fprintf('%s; %.1f; %s; %s,000\n', jf.format(r.area), r.meanDensity, ...
         jf.format(round(r.biomass/1e3)*1e3), ...
         jf.format(round(r.varianceComponent/1e9)))
@@ -58,7 +58,7 @@ end
 % surveys
 disp('surveys for pasting')
 for i = 1:height(results.biomass_survey)
-    r = results.biomass_survey(i,2:7);
+    r = results.biomass_survey(1,{'meanDensity' 'meanDensityVariance' 'meanDensityCV' 'biomass' 'variance' 'CV'});
     fprintf('%.1f; %.1f; %.0f; %s; %s,000; %.0f\n', r.meanDensity, ...
         r.meanDensityVariance, r.meanDensityCV, ...
         jf.format(round(r.biomass/1e3)*1e3), ...
