@@ -226,6 +226,16 @@ for i = 1:length(lf_keith)
 end
 fclose(fid);
 
+% and save the lengths per stratum, for checking with Martin
+
+fid = fopen(fullfile(resultsDir, 'Trawls - per strata.csv'), 'w');
+fprintf(fid, 'stratum,lengths\n');
+for i = 1:length(lf.strata)
+    fprintf(fid, '%s', lf.strata(i).stratum);
+    fprintf(fid, ',%d', lf.strata(i).lengths);
+    fprintf(fid, '\n');
+end
+
 %%%%%%%%%%%%%%%%%%%%%%
 % Do some plots
 %%%%%%%%%%%%%%%%%%%%%%
