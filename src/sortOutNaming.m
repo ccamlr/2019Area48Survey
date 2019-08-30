@@ -38,6 +38,9 @@ function [stratum, transect] = sortOutNaming(t)
     elseif startsWith(t, "Sand")
         stratum = "Sand";
         transect = extractAfter(t,4);
+    elseif startsWith(t, "WCB")
+        stratum = "WCB";
+        transect = extractAfter(t,3);
     else
         stratum = "Unknown";
         transect = "Unknown";

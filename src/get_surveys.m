@@ -13,3 +13,6 @@ surveys(s).strata = "SOF"; s = s + 1;
 
 surveys(s).name = 'Norway1';
 surveys(s).strata = "SOC"; s = s + 1;
+
+surveys(s).name = 'UK';
+surveys(s).strata = "WCB"; s = s + 1;
