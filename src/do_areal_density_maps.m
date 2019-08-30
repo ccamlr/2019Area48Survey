@@ -63,7 +63,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     % Use a different colour and symbol for each statum
 
     s = unique(nasc.Stratum);
-    symbols = {'o' 'o' 'o' 'o' 'o' 'o' 'o' 'd' 'd' 'd' 'd' 'd' 'd' 'd'};
+    symbols = {'o' 'o' 'o' 'o' 'o' 'o' 'o' 'd' 'd' 'd' 'd' 'd' 'd' 'd' '<'};
     h = nan(size(s));
     for i = 1:length(s)
         j = find(nasc.Stratum == s(i));
