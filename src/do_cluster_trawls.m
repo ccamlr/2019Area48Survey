@@ -4,6 +4,7 @@
 
 do_define_directories
 dataDir = fullfile(baseDir, 'data', 'catch');
+catchDir = fullfile(baseDir, repoDir, 'catch_data');
 
 clear lf
 
@@ -164,10 +165,35 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Do the lf per the 3 main CCAMLR 2000 strata, as discussed in SG-ASAM-2019
 % Load survey strata
-strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey strata.geojson')));
 
-% and filter on the time that the strata were surveyed
-large_strata = ["SS" "AP" "ESS"];
+% This was done by Keith Reid and is loaded here...
+lff = readtable(fullfile(catchDir, 'jason_indeed.csv'));
+lff = removevars(lff, {'Var1'});
+Klen = [lff.Klen; lff.Klen(end)+1]; % HACK. Define the upper limit of the last bin as 1mm more
+
+for i = 1:length(strata.features)
+    st_name = strata.features(i).properties.stratum;
+    if ismember(st_name, {'AP' 'SSI' 'West' 'Elephant' 'Bransfield' 'Joinville'}) % Using AP
+        disp(['Stratum ' st_name ' given lf from AP'])
+        lf.strata(i).ASAM2019_normalised_lf_prop = lff.AP';
+        lf.strata(i).ASAM2019_normalised_lf_len = Klen';
+    elseif ismember(st_name, {'SS' 'SG' 'SOI' 'SOC' 'SOF' 'WCB'}) % Using SS
+        disp(['Stratum ' st_name ' given lf from SS'])
+        lf.strata(i).ASAM2019_normalised_lf_prop = lff.SS';
+        lf.strata(i).ASAM2019_normalised_lf_len = Klen';
+    elseif ismember(st_name, {'ESS' 'Sand'}) % Using ESS
+        disp(['Stratum ' st_name ' given lf from ESS'])
+        lf.strata(i).ASAM2019_normalised_lf_prop = lff.ESS';
+        lf.strata(i).ASAM2019_normalised_lf_len = Klen';
+    else
+        error('Unknown strata!')
+    end
+end
+
+% His process is repeated here cause I want this processing to be in
+% here...
+
+% and we do a comparison to check.
 
 
 
@@ -344,6 +370,24 @@ for i = 1:length(lf.vessel)
 end
 
 ifile = fullfile(resultsDir, 'Trawls - lf per vessel.png');
+print(ifile, '-dpng', '-r300')
+crop_image(ifile)
+
+
+figure(6) % The lf's used for each strata, as agreed upon in the 2019 ASAM meeting
+clf
+for i = 1:length(lf.strata)
+    subplot(4,4,i)
+    histogram('BinEdges', lf.strata(i).ASAM2019_normalised_lf_len, ...
+        'BinCounts', lf.strata(i).ASAM2019_normalised_lf_prop, 'EdgeColor', 'none', ...
+        'FaceColor', 'k')
+    textLoc(lf.strata(i).stratum, 'NorthWest');
+    if i >= 10
+        xlabel('Length (mm)')
+    end
+end
+
+ifile = fullfile(resultsDir, 'Trawls - lf per stratum ASAM2019.png');
 print(ifile, '-dpng', '-r300')
 crop_image(ifile)
 
