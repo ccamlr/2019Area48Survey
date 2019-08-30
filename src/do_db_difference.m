@@ -88,6 +88,15 @@ ts.ts120 = T_TS(2,:)';
 ts.ts200 = T_TS(3,:)';
 ts.length = krill_ls';
 
+% or load the numbers calculated using the Matlab package
+% load(fullfile(resultsDir, 'SDWBA-TS-2019-038kHz'), 'krill_ts');
+% ts.ts038 = 10*log10([krill_ts.ts.sigma_avg]);
+% load(fullfile(resultsDir, 'SDWBA-TS-2019-120kHz'), 'krill_ts');
+% ts.ts120 = 10*log10([krill_ts.ts.sigma_avg]);
+% load(fullfile(resultsDir, 'SDWBA-TS-2019-200kHz'), 'krill_ts') ;
+% ts.ts200 = 10*log10([krill_ts.ts.sigma_avg]);
+% ts.length = round([krill_ts.ts.ActualLength]*1000);
+
 k = 1;
 for len_min = (10:10:50)
     for len_max = len_min+10:10:60
