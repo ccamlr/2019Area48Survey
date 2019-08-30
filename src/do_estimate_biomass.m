@@ -21,13 +21,25 @@ load(fullfile(resultsDir, 'Trawls - data'), 'lf')
 % Weighted conversion factor for each strata and cluster
 for t = ["strata" "cluster"]
     for i = 1:length(lf.(t))
-        histedges = lf.(t)(i).histedges(1:end-1) * 1e-3; % [m]
+        if t == "strata"
+            histedges = lf.(t)(i).ASAM2019_normalised_lf_len(1:end-1) * 1e-3; % [m]
+        else
+            histedges = lf.(t)(i).histedges(1:end-1) * 1e-3; % [m]
+        end
+
         j = ismember(krill_len, histedges);
         sigma = krill_sigma(j); % [m^2]
         
         % Weighted conversion factor as per EMM-16/38, eqn 8.
-        C = sum(lf.(t)(i).histcounts .* w(histedges)) ./ ...
-            sum(lf.(t)(i).histcounts .* sigma); % [g/m^2]
+        if t == "strata"
+            C = sum(lf.(t)(i).ASAM2019_normalised_lf_prop .* w(histedges)) ./ ...
+                sum(lf.(t)(i).ASAM2019_normalised_lf_prop .* sigma); % [g/m^2]
+        else
+            C = sum(lf.(t)(i).histcounts .* w(histedges)) ./ ...
+                sum(lf.(t)(i).histcounts .* sigma); % [g/m^2]
+        end
+        
+        
         lf.(t)(i).C = C;
     end
 end
