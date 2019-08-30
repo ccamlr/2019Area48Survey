@@ -3,7 +3,7 @@ function surveys = get_surveys()
 
 s = 1;
 surveys(s).name = 'CCAMLR 2019';
-surveys(s).strata = ["AP", "SS", "SSI", "SOI", "Sand", "ESS"]; s = s + 1;
+surveys(s).strata = ["AP", "SS", "SSI", "SOI", "Sand", "ESS", "SG"]; s = s + 1;
 
 surveys(s).name = 'AMLR 2019';
 surveys(s).strata = ["Joinville", "Elephant", "West", "Bransfield"]; s = s + 1;
