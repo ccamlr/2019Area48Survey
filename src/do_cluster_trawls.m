@@ -324,23 +324,23 @@ crop_image(ifile)
 figure(4) % All the lf's
 clf
 for i = 1:length(lf.strata)
-    subplot(4,4,i)
+    subplot(5,4,i)
     histogram('BinEdges', lf.strata(i).histedges, ...
         'BinCounts', lf.strata(i).histcounts, 'EdgeColor', 'none', ...
         'FaceColor', 'k')
     textLoc(lf.strata(i).stratum, 'NorthWest');
-    if i >= 13
+    if i >= 14
         xlabel('Length (mm)')
     end
 end
 for i = 1:length(lf.cluster)
     j = length(lf.strata) + i;
-    subplot(4,4,j)
+    subplot(5,4,j)
     histogram('BinEdges', lf.cluster(i).histedges, ...
         'BinCounts', lf.cluster(i).histcounts, 'EdgeColor', 'none', ...
         'FaceColor', 'k')
     textLoc(lf.cluster(i).cluster, 'NorthWest');
-    if j >= 13
+    if j >= 14
         xlabel('Length (mm)')
     end
 end
