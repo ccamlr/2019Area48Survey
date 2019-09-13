@@ -109,6 +109,24 @@ end
 rmpath(SDWBAdir)
 
 %%
+% Convert the Ts values in the .mat files into a combined csv file that is
+% stored in the repository, for easy viewing and use by others in the
+% future.
+clear easypeasy
+load(fullfile(resultsDir, 'SDWBA-TS-2019-038kHz.mat'), 'krill_ts')
+easypeasy.length = [krill_ts.ts.ActualLength]'*1000;
+easypeasy.TS038 = 10*log10([krill_ts.ts.sigma_avg]');
+
+load(fullfile(resultsDir, 'SDWBA-TS-2019-120kHz.mat'), 'krill_ts')
+easypeasy.TS120 = 10*log10([krill_ts.ts.sigma_avg]');
+
+load(fullfile(resultsDir, 'SDWBA-TS-2019-200kHz.mat'), 'krill_ts')
+easypeasy.TS200 = 10*log10([krill_ts.ts.sigma_avg]');
+
+ts = struct2table(easypeasy);
+writetable(ts, fullfile(resultsDir, 'SDWBA-TS-38-120-200.csv'))
+
+%%
 % and a little comparison between what is calculated above and what is in
 % Table 2 of WG-EMM-16/38 (and is also in the file
 % ASAM_TS_krill_length_values_alt_fin.mat, which is stored in the results
