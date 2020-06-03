@@ -10,7 +10,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     figure(1)
     clf
     s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
-    plot_standard_map(strata, 'showStrataNames', false, 'strata', s)
+    plot_standard_map(strata, 'showStrataNames', false, 'strataToPlot', s)
 
     % Use a different colour for each vessel
     %v = unique(nasc.Vessel);
@@ -34,7 +34,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     s = ["Bransfield" "Elephant" "Joinville" "West"];
 
     plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
-        'strata', s, 'showStrataNames', true, ...
+        'strataToPlot', s, 'showStrataNames', true, ...
         'coastDetail', 'high')
 
     % Use a different colour for each vessel
@@ -84,7 +84,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
 
     s = ["Bransfield" "Elephant" "Joinville" "West"];
     plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
-        'strata', s, 'showStrataNames', true, ...
+        'strataToPlot', s, 'showStrataNames', true, ...
         'coastDetail', 'high')
 
     for i = 1:length(s)
@@ -112,7 +112,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
 
     s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
     plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
-        'strata', s, 'showStrataNames', true, ...
+        'strataToPlot', s, 'showStrataNames', true, ...
         'coastDetail', 'intermediate', 'showSubAreas', true)
 
     for i = 1:length(s)
@@ -132,7 +132,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
 
     s = ["SOI" "SOC" "SOF"];
     plot_standard_map(strata, 'centrePoint', [-45.7 -60.75], 'radius', 2.5, ...
-        'strata', s, 'showStrataNames', true, ...
+        'strataToPlot', s, 'showStrataNames', true, ...
         'coastDetail', 'fine')
 
     for i = 1:length(s)
@@ -144,6 +144,21 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     ifile = fullfile(saveDir, [prefix ' - South Orkney.png']);
     print(ifile, '-dpng','-r300')
     crop_image(ifile)
+    
+    %%%%%%%%%%%%%
+    % a map of where we are in the world
+    figure(7)
+    clf
+    
+    plot_standard_map(strata, 'showStrataNames', false, 'centrePoint', [0 -90], ...
+        'radius', 90, 'strataColour', 'k')
+    %m_coast('patch',[0.5 0.5 0.5]);
+    m_grid('xticklabel',[],'yticklabel',[],'linestyle',':', 'box', 'off')
+        
+    ifile = fullfile(saveDir, 'globe with survey area.png');
+    print(ifile, '-dpng','-r300')
+    crop_image(ifile)
+    
 end
 
 

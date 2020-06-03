@@ -9,6 +9,8 @@ p.addOptional('radius', 17)
 p.addOptional('strataToPlot', []);
 p.addOptional('coastDetail', 'low');
 p.addOptional('showSubAreas', false)
+p.addOptional('strataColour', [0.5 0.5 0.5])
+
 parse(p, varargin{:});
 
 m_proj('Azimuthal Equal-area', ...
@@ -50,7 +52,7 @@ for i = 1:length(strata.features)
     if isempty(p.Results.strataToPlot) || ...
         contains(strata.features(i).properties.stratum,p.Results.strataToPlot)
         poly = squeeze(strata.features(i).geometry.coordinates);
-        m_line(poly(:,1), poly(:,2), 'color', [0.5 0.5 0.5])
+        m_line(poly(:,1), poly(:,2), 'color', p.Results.strataColour)
     
         if p.Results.showStrataNames
             % Add the stratum name at the most northly point of the stratum
