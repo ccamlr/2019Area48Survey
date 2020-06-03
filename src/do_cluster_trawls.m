@@ -391,6 +391,73 @@ ifile = fullfile(resultsDir, 'Trawls - lf per stratum ASAM2019.png');
 print(ifile, '-dpng', '-r300')
 crop_image(ifile)
 
+%%%%%%%%%%%%%%%%%%%%%%
+figure(7) % Map of stations and strata
+clf
+plot_standard_map(strata, 'showStrataNames', false)
+
+% plot the station positions
+clear h labels
+
+% Plot the stations that weren't used
+for i = 1:length(stationsToNotUse)
+    h(1) = m_scatter([lf_raw(stationsToNotUse(i)).lon], ...
+        [lf_raw(stationsToNotUse(i)).lat], 10, 'k');
+end
+labels{1} = 'Not used';
+    
+% Plot the stations that were used
+for i = 1:length(stationsToUse)
+    m_scatter([lf_raw(stationsToUse(i)).lon], ...
+        [lf_raw(stationsToUse(i)).lat], 10, 'k', 'filled');
+end
+
+m_grid('box', 'on')
+
+ifile = fullfile(resultsDir, 'Trawls - map without clusters.png');
+print(ifile, '-dpng','-r300')
+crop_image(ifile)
+
+figure(8) % All the lf's from each strata. Same as Figure 4 but without the cluster lfs.
+clf
+for i = 1:length(lf.strata)
+    subplot(4,4,i)
+    histogram('BinEdges', lf.strata(i).histedges, ...
+        'BinCounts', lf.strata(i).histcounts, 'EdgeColor', 'none', ...
+        'FaceColor', 'k')
+    textLoc(lf.strata(i).stratum, 'NorthWest');
+    if i >= 14
+        xlabel('Length (mm)')
+    end
+end
+
+ifile = fullfile(resultsDir, 'Trawls - lf per stratum only.png');
+print(ifile, '-dpng', '-r300')
+crop_image(ifile)
+
+figure(9)
+clf
+j = 1;
+for i = 1:length(lf.strata)
+    st_name = strata.features(i).properties.stratum;
+    if ismember(st_name, {'AP' 'SS' 'Sand'})
+        subplot(1,3,j)
+        histogram('BinEdges', lf.strata(i).ASAM2019_normalised_lf_len, ...
+            'BinCounts', lf.strata(i).ASAM2019_normalised_lf_prop, 'EdgeColor', 'none', ...
+            'FaceColor', 'k')
+        axis square
+        textLoc(lf.strata(i).stratum, 'NorthWest');
+        if i >= 10
+            xlabel('Length (mm)')
+        end
+        j = j + 1;
+    end
+end
+
+ifile = fullfile(resultsDir, 'Trawls - lf per area grouping ASAM2019.png');
+print(ifile, '-dpng', '-r300')
+crop_image(ifile)
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function lf = load_lf_data(dataDir)
     % Am only interested in the length-frequencies, so will reduce the
@@ -483,9 +550,9 @@ function lf = load_lf_data(dataDir)
     c = readtable(fullfile(dataDir, 'KPH_krill_catch_extract.csv'));
     
     % fix some column data types
-    c.lon = str2double(c.lon);
-    c.lat = str2double(c.lat);
-    c.len = str2double(c.len);
+    %c.lon = str2double(c.lon);
+    %c.lat = str2double(c.lat);
+    %c.len = str2double(c.len);
     
     stations = unique(c.serienr);
     k = length(lf) + 1;
@@ -521,9 +588,9 @@ function lf = load_lf_data(dataDir)
     c = readtable(fullfile(dataDir, 'CDH_krill_catch_extract.csv'));
     
     % fix some column data types
-    c.lon = str2double(c.lon);
-    c.lat = str2double(c.lat);
-    c.len = str2double(c.len);
+    %c.lon = str2double(c.lon);
+    %c.lat = str2double(c.lat);
+    %c.len = str2double(c.len);
     
     stations = unique(c.serienr);
     k = length(lf) + 1;
