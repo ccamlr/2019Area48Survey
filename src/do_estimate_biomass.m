@@ -44,6 +44,19 @@ for t = ["strata" "cluster"]
     end
 end
 
+% lf summary for the 3 areas that are actually used in the biomass
+s = {'SS' 'AP' 'Sand'};
+for i = 1:length(lf.strata)
+    if ismember(lf.strata(i).stratum, s)
+        meanLength = sum(lf.strata(i).ASAM2019_normalised_lf_prop .* lf.strata(i).ASAM2019_normalised_lf_len(1:end-1)) ./ sum(lf.strata(i).ASAM2019_normalised_lf_prop);
+        stdLength = 1; % need to work this out!!
+        lf.strata(i).ASAM2019_normalised_lf_prop;
+        lf.strata(i).ASAM2019_normalised_lf_len;
+        disp(['Mean length for area ' lf.strata(i).stratum ' = ' num2str(meanLength) ' mm.'])
+        disp(['Standard deviation of length for area ' lf.strata(i).stratum ' = ' num2str(stdLength) ' mm.'])
+    end
+end
+
 % for the maps
 strata = jsondecode(fileread(fullfile(baseDir, repoDir, 'map_data', 'survey strata.geojson')));
 
