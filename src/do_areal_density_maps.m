@@ -113,7 +113,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
     plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
         'strata', s, 'showStrataNames', true, ...
-        'coastDetail', 'intermediate')
+        'coastDetail', 'intermediate', 'showSubAreas', true)
 
     for i = 1:length(s)
         j = find(nasc.Stratum == s(i));

@@ -8,6 +8,7 @@ p.addOptional('centrePoint', [-45 -60])
 p.addOptional('radius', 17)
 p.addOptional('strataToPlot', []);
 p.addOptional('coastDetail', 'low');
+p.addOptional('showSubAreas', false)
 parse(p, varargin{:});
 
 m_proj('Azimuthal Equal-area', ...
@@ -31,6 +32,19 @@ switch p.Results.coastDetail
 end
 
 hold on
+
+if p.Results.showSubAreas
+    b = m_shaperead('../map_data/asd-shapefile-WGS84');
+    % only want to show specific sub areas
+    areas = {'Subarea 48.1' 'Subarea 48.2' 'Subarea 48.3' 'Subarea 48.4' };
+    for i = 1:length(b.ncst)
+        if ismember(b.dbfdata{i,2}, areas)
+            m_line(b.ncst{i}(:,1), b.ncst{i}(:,2), 'color', 'k')
+            m_text(min(b.ncst{i}(:,1)), max(b.ncst{i}(:,2)), b.dbfdata{i,2}(9:end), ...
+                'HorizontalAlignment', 'left', 'VerticalAlignment', 'top')
+        end
+    end
+end
 
 for i = 1:length(strata.features)
     if isempty(p.Results.strataToPlot) || ...
