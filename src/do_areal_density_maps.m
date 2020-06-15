@@ -104,6 +104,14 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     ifile = fullfile(saveDir, [prefix ' - AMLR.png']);
     print(ifile, '-dpng','-r300')
     crop_image(ifile)
+    
+    % and a version for the paper
+    if strcmp(prefix, 'Krill density')
+        ifile = fullfile(saveDir,  'Figure 6d.png');
+        print(ifile, '-dpng','-r600')
+        crop_image(ifile)
+    end
+
 
     %%%%%%%%%%%
     % CCAMLR 2000 strata and transects
@@ -125,6 +133,13 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     print(ifile, '-dpng','-r300')
     crop_image(ifile)
 
+    % and a version for the paper
+    if strcmp(prefix, 'Krill density')
+        ifile = fullfile(saveDir,  'Figure 6b.png');
+        print(ifile, '-dpng','-r600')
+        crop_image(ifile)
+    end
+    
     %%%%%%%%%%%
     % Zoom on the South Orkney strata and transects
     figure(6)
@@ -145,19 +160,34 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     print(ifile, '-dpng','-r300')
     crop_image(ifile)
     
+    % and a version for the paper
+    if strcmp(prefix, 'Krill density')
+        ifile = fullfile(saveDir,  'Figure 6c.png');
+        print(ifile, '-dpng','-r600')
+        crop_image(ifile)
+    end
+    
     %%%%%%%%%%%%%
     % a map of where we are in the world
     figure(7)
     clf
     
-    plot_standard_map(strata, 'showStrataNames', false, 'centrePoint', [0 -90], ...
-        'radius', 90, 'strataColour', 'k')
+    plot_standard_map(strata, 'showStrataNames', false, 'centrePoint', [-45 -65], ...
+        'rotation', 45, 'radius', 40, 'strataColour', 'k')
     %m_coast('patch',[0.5 0.5 0.5]);
     m_grid('xticklabel',[],'yticklabel',[],'linestyle',':', 'box', 'off')
         
     ifile = fullfile(saveDir, 'globe with survey area.png');
     print(ifile, '-dpng','-r300')
     crop_image(ifile)
+    
+    % and a version for the paper
+    if strcmp(prefix, 'Krill density')
+        ifile = fullfile(saveDir,  'Figure 6a.png');
+        print(ifile, '-dpng','-r600')
+        crop_image(ifile)
+    end
+
     
 end
 

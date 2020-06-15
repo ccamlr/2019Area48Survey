@@ -181,6 +181,11 @@ ifile = fullfile(resultsDir, 'CTD - station map.png');
 print(ifile, '-dpng','-r300')
 crop_image(ifile)
 
+% and a version for the paper
+ifile = fullfile(resultsDir, 'Figure 5.png');
+print(ifile, '-dpng','-r600')
+crop_image(ifile)
+
 % save the results
 save(fullfile(resultsDir, 'CTD - data'), 'ctd', 'results', 'uniform')
 

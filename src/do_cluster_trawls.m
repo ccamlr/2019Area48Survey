@@ -373,6 +373,10 @@ ifile = fullfile(resultsDir, 'Trawls - lf per vessel.png');
 print(ifile, '-dpng', '-r300')
 crop_image(ifile)
 
+% and a version for the paper
+ifile = fullfile(resultsDir, 'Figure 4.png');
+print(ifile, '-dpng', '-r600')
+crop_image(ifile)
 
 figure(6) % The lf's used for each strata, as agreed upon in the 2019 ASAM meeting
 clf
@@ -418,6 +422,12 @@ ifile = fullfile(resultsDir, 'Trawls - map without clusters.png');
 print(ifile, '-dpng','-r300')
 crop_image(ifile)
 
+% and a version for the paper
+ifile = fullfile(resultsDir, 'Figure 1.png');
+print(ifile, '-dpng','-r600')
+crop_image(ifile)
+
+
 figure(8) % All the lf's from each strata. Same as Figure 4 but without the cluster lfs.
 clf
 for i = 1:length(lf.strata)
@@ -434,6 +444,12 @@ end
 ifile = fullfile(resultsDir, 'Trawls - lf per stratum only.png');
 print(ifile, '-dpng', '-r300')
 crop_image(ifile)
+
+% and a version for the paper
+ifile = fullfile(resultsDir, 'Figure 2.png');
+print(ifile, '-dpng', '-r600')
+crop_image(ifile)
+
 
 figure(9)
 clf
@@ -456,6 +472,11 @@ end
 
 ifile = fullfile(resultsDir, 'Trawls - lf per area grouping ASAM2019.png');
 print(ifile, '-dpng', '-r300')
+crop_image(ifile)
+
+% and a version for the paper
+ifile = fullfile(resultsDir, 'Figure 3.png');
+print(ifile, '-dpng', '-r600')
 crop_image(ifile)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
