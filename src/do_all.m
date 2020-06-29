@@ -65,6 +65,65 @@ for i = 1:height(results.biomass_survey)
         jf.format(round(r.variance/1e9)), ...
         r.CV)
 end
+%% Output the results in the CCAMLR-formatted spreadsheet format
+% This is format for WG-ASAM to use to collate acoustic survey results
+% Use the generated csv file to import into the spreadsheet
+
+t = struct2table(results.strata);
+t = removevars(t, {'transect', 'stratumLength', 'densityVariance', 'varianceComponent_transect', 'biomass', 'varianceComponent_stratum'});
+t.Properties.VariableNames{'name'} = 'stratumName';
+t.Properties.VariableNames{'CV'} = 'densityCV';
+t.Properties.VariableNames{'area'} = 'surveyArea';
+t.Properties.VariableNames{'meanDensity'} = 'densityEstimate';
+
+t.year = repmat(2019, height(t), 1);
+t.month = repmat({'Dec,Jan,Feb,Mar'}, height(t), 1);
+t.vessel = repmat({'several'}, height(t), 1);
+t.contributor = repmat({'ARK,China,Korea,Norway,Ukraine,United Kingdom'}, height(t), 1);
+t.subarea = repmat({''}, height(t), 1);
+t.surveyName = repmat({'2019 synoptic'}, height(t), 1);
+t.CVmethod = repmat({'Jolly and Hampton'}, height(t), 1);
+t.echosounder = repmat({'EK60,ES70,ES80,EK80'}, height(t), 1);
+t.frequency = repmat('120', height(t), 1);
+t.otherFreq = repmat({'various'}, height(t), 1);
+t.targetIDMethod = repmat({'Swarms identification'}, height(t), 1);
+t.dbDifference = repmat({'NA'}, height(t), 1);
+t.TSmodel = repmat({'full SDWBA (ASAM 2010 parameterisation)'}, height(t), 1);
+t.depthRange = repmat(250, height(t), 1);
+t.timeOfDay = repmat({'day and night'}, height(t), 1);
+t.surveyDesign = repmat({'As per CCAMLR 2000 survey'}, height(t), 1);
+t.reference = repmat({''}, height(t), 1);
+t.note = repmat({''}, height(t), 1);
+
+t = movevars(t, {'densityEstimate'}, 'After', 'surveyName');
+t = movevars(t, {'densityCV'}, 'After', 'densityEstimate');
+t = movevars(t, {'surveyArea'}, 'After', 'CVmethod');
+t = movevars(t, {'stratumName'}, 'After', 'timeOfDay');
+
+% fix some things
+for i = 1:height(t)
+    switch t.stratumName{i}
+        case {'SS'}
+            t.subarea(i) = {'48.2, 48.3'};
+        case {'AP', 'SSI', 'Elephant', 'West', 'Bransfield', 'Joinville'}
+            t.subarea(i) = {'48.1'};
+        case {'SOI', 'SOF', 'SOC'}
+            t.subarea(i) = {'48.2'};
+        case {'SG', 'WCB'}
+            t.subarea(i) = {'48.3'};
+        case {'Sand', 'ESS'}
+            t.subarea(i) = {'48.4'};
+    end
+    
+    %if strcmp(t.stratumName{i}, 'WCB')
+    %    t.contributor(i) = {'United Kingdom'};
+    %end
+end
+
+
+
+writetable(t, fullfile(resultsDir, 'WG_EMM_krill_biomass_time_series_information_synoptic_2019.csv'), ...
+    'FileType', 'text', 'Delimiter', ',', 'QuoteStrings', true)
 
 %% Show the comparison of KPH swarm verses dB-difference krill classification
 do_define_directories

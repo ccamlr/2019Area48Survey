@@ -8,18 +8,18 @@
 do_define_directories
 SDWBAdir = fullfile(baseDir, repoDir, 'src', 'SDWBApackage2010');
 
-resultsFile = 'SDWBA-TS-2019-120kHz';
+resultsFile = 'SDWBA-TS-2019-070kHz';
 
 addpath(SDWBAdir)
 
 % Key parameters
-ActualLengths = (10:67)*1e-3; % [m]
+ActualLengths = ((10:67))*1e-3; % [m]
 h0 = 1.0279; % sound speed contrast
 g0 = 1.0357; % density contrast
 c = 1456; % sound speed [m/s]
 
 % Operational parameters
-frequency = 120e3; % [Hz]
+frequency = 70e3; % [Hz]
 phi = -90:1:269; % [deg]
 noise_realisations = 100;
 
@@ -31,7 +31,7 @@ r0 = r;
 N0 = length(a)-1;
 L0 = 38.35*1e-3; % [m]
 fatness_factor = 1.4;
-freq0 = 120e3; % [Hz]
+freq0 = 38e3; % [Hz]
 stdphase0 = sqrt(2)/2;
 
 % For tilt averaging
@@ -117,6 +117,9 @@ load(fullfile(resultsDir, 'SDWBA-TS-2019-038kHz.mat'), 'krill_ts')
 easypeasy.length = [krill_ts.ts.ActualLength]'*1000;
 easypeasy.TS038 = 10*log10([krill_ts.ts.sigma_avg]');
 
+load(fullfile(resultsDir, 'SDWBA-TS-2019-070kHz.mat'), 'krill_ts')
+easypeasy.TS070 = 10*log10([krill_ts.ts.sigma_avg]');
+
 load(fullfile(resultsDir, 'SDWBA-TS-2019-120kHz.mat'), 'krill_ts')
 easypeasy.TS120 = 10*log10([krill_ts.ts.sigma_avg]');
 
@@ -124,7 +127,69 @@ load(fullfile(resultsDir, 'SDWBA-TS-2019-200kHz.mat'), 'krill_ts')
 easypeasy.TS200 = 10*log10([krill_ts.ts.sigma_avg]');
 
 ts = struct2table(easypeasy);
-writetable(ts, fullfile(resultsDir, 'SDWBA-TS-38-120-200.csv'))
+writetable(ts, fullfile(resultsDir, 'SDWBA-TS-38-70-120-200.csv'), ...
+    'WriteVariableNames', true)
+
+% do this output in the StoX XML format
+
+tsparameters = struct('Name', 'CCAMLR SDWBA', 'NumberofCylinders', 14, ...
+    'BaseShape', 'something', 'LengthMeasurement', 'Model run lengths are at the given lengths', ...
+    'AndManyOtherParametersGoHere', '0');
+
+datasets = struct('label', {'TS038', 'TS070', 'TS120', 'TS200'}, 'freq', {38000, 70000, 12000, 200000});
+clear dataset
+for i = 1:length(datasets)
+    dataset(i) = struct('Frequency', struct('CONTENT', datasets(i).freq, 'ATTRIBUTE', struct('units', 'Hz')), ...
+        'Lengths', struct('CONTENT', strjoin(compose('%.2f', easypeasy.length), ';'), 'ATTRIBUTE', struct('units', 'mm')), ...
+        'TS', struct('CONTENT', strjoin(compose('%.2f', easypeasy.(datasets(i).label)), ';'), 'ATTRIBUTE', struct('units', 'dB')));
+end
+
+ts_struct = struct('TSParameters', tsparameters, 'SpeciesCategory', 'KRILL', ...
+    'Dataset', dataset);
+Root = struct('TS', ts_struct, 'ATTRIBUTE', struct('FileFormatVersion', '1.00'));
+
+xml_write(fullfile(resultsDir, 'SDWBA-TS-38-70-120-200.xml'), Root);
+
+
+% and then the version at 0.5 mm intervals
+clear easypeasy
+load(fullfile(resultsDir, 'SDWBA-TS-2019-038kHz-0_5mm.mat'), 'krill_ts')
+easypeasy.length = [krill_ts.ts.ActualLength]'*1000;
+easypeasy.TS038 = 10*log10([krill_ts.ts.sigma_avg]');
+
+load(fullfile(resultsDir, 'SDWBA-TS-2019-070kHz-0_5mm.mat'), 'krill_ts')
+easypeasy.TS070 = 10*log10([krill_ts.ts.sigma_avg]');
+
+load(fullfile(resultsDir, 'SDWBA-TS-2019-120kHz-0_5mm.mat'), 'krill_ts')
+easypeasy.TS120 = 10*log10([krill_ts.ts.sigma_avg]');
+
+load(fullfile(resultsDir, 'SDWBA-TS-2019-200kHz-0_5mm.mat'), 'krill_ts')
+easypeasy.TS200 = 10*log10([krill_ts.ts.sigma_avg]');
+
+ts = struct2table(easypeasy);
+writetable(ts, fullfile(resultsDir, 'SDWBA-TS-38-70-120-200-0_5mm.csv'), ...
+    'WriteVariableNames', true)
+
+% do this output in the StoX XML format
+
+tsparameters = struct('Name', 'CCAMLR SDWBA', 'NumberofCylinders', 14, ...
+    'BaseShape', 'something', 'LengthMeasurement', 'Model run lengths are 0.5 mm greater than the given lengths', ...
+    'AndManyOtherParametersGoHere', '0');
+
+datasets = struct('label', {'TS038', 'TS070', 'TS120', 'TS200'}, 'freq', {38000, 70000, 12000, 200000});
+clear dataset
+for i = 1:length(datasets)
+    dataset(i) = struct('Frequency', struct('CONTENT', datasets(i).freq, 'ATTRIBUTE', struct('units', 'Hz')), ...
+        'Lengths', struct('CONTENT', strjoin(compose('%.2f', easypeasy.length), ';'), 'ATTRIBUTE', struct('units', 'mm')), ...
+        'TS', struct('CONTENT', strjoin(compose('%.2f', easypeasy.(datasets(i).label)), ';'), 'ATTRIBUTE', struct('units', 'dB')));
+end
+
+ts_struct = struct('TSParameters', tsparameters, 'SpeciesCategory', 'KRILL', ...
+    'Dataset', dataset);
+Root = struct('TS', ts_struct, 'ATTRIBUTE', struct('FileFormatVersion', '1.00'));
+
+xml_write(fullfile(resultsDir, 'SDWBA-TS-38-70-120-200-0_5mm.xml'), Root);
+
 
 %%
 % and a little comparison between what is calculated above and what is in
