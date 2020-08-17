@@ -1,20 +1,20 @@
 
 
 # Choose your ship: 'MS', 'KPH', 'KJH', or 'CDH'
-vessel<-'MS'
+vessel<-'CDH'
 
 ###Path to rawdata
 if (vessel == 'CDH') {
-	rawdata<-'I:\\KRILL2019\\cruise_folders\\CDH2019828\\ACOUSTIC\\EK80\\EK80_RAW_REDUCED'
+	rawdata<-'D:\\Working\\KRILL\\KRILL2019\\cruise_folders\\CDH2019828\\ACOUSTIC\\EK80\\EK80_RAW_REDUCED'
 } else if (vessel == 'KPH') {
-    rawdata<-'I:\\KRILL2019\\cruise_folders\\S2019701_PKRONPRINSHAAKON_9566\\ACOUSTIC\\EK80\\EK80_ORIGINALRAWDATA\\EK80DK'
+    rawdata<-'D:\\Working\\KRILL\\KRILL2019\\cruise_folders\\S2019701_PKRONPRINSHAAKON_9566\\ACOUSTIC\\EK80\\EK80_ORIGINALRAWDATA\\EK80DK'
 } else if (vessel == 'MS') {
-    rawdata<-'J:\\KRILL2019\\cruise_folders\\MS2019999\\ACOUSTIC\\ES80\\ES80_RAWDATA_REDUCED'
+    rawdata<-'D:\\Working\\KRILL\\KRILL2019\\cruise_folders\\MS2019999\\ACOUSTIC\\ES80\\ES80_RAWDATA_REDUCED'
 } else if (vessel == 'KJH') {
-    rawdata<-'I:\\KRILL2019\\cruise_folders\\KJH2019999\\ACOUSTIC\\EK60\\EK60_ORIGINALRAWDATA'
+    rawdata<-'D:\\Working\\KRILL\\KRILL2019\\cruise_folders\\KJH2019999\\ACOUSTIC\\EK60\\EK60_ORIGINALRAWDATA'
 }
 
-wd<-paste0('J:\\KRILL2019\\data\\echo-integration\\', vessel, '\\')
+wd<-paste0('D:\\Working\\KRILL\\KRILL2019\\data\\echo-integration-2020\\', vessel, '\\')
 
 ###Read reference file (Start and stop of transects)
 refFile<-read.csv(paste0(wd,'transects.csv'),sep=',', header=TRUE)

@@ -4,7 +4,7 @@
 
 do_define_directories
 dataDir = fullfile(baseDir, 'data', 'echo-integration');
-
+dataDir = fullfile(baseDir, 'data', 'echo-integration-2020');
 
 vessels = {'CDH' 'KJH' 'KPH' 'MS' 'FRH' 'RRS'};
 
@@ -151,8 +151,13 @@ end
 
 % Tidy up things:
 %   For miles inside exclude regions Echoview produces values of -9.9e37.
+%   In some cases there is a -999, so set those to zero instead. And some GPS
+%   positions are 999 that we remove too (but these tend to be -9.93e7 so
+%   get removed anyway).
 %   Remove those rows.
 nasc = nasc(nasc.NASC ~= -9.9e37,:);
+nasc.NASC(nasc.NASC == -999) = 0.0;
+nasc = nasc(nasc.Latitude ~= 999 | nasc.Longitude ~= 999,:);
 % merge the date and time columns into one
 nasc.Ping_timestamp = nasc.Ping_date + timeofday(nasc.Ping_time);
 nasc.Ping_timestamp.Format = 'yyyy-MM-dd HH:mm:ss.SSSS';

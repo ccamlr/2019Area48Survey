@@ -65,6 +65,18 @@ for i = 1:height(results.biomass_survey)
         jf.format(round(r.variance/1e9)), ...
         r.CV)
 end
+
+% report the start and stop survey dates for each stratum
+strata = unique(results.nasc.Stratum);
+for i = 1:length(strata)
+    s = strcmp(results.nasc.Stratum, strata(i));
+    startTime = min(results.nasc.Ping_timestamp(s));
+    stopTime = max(results.nasc.Ping_timestamp(s));
+    disp(sprintf('%s, %s, %s', strata(i), startTime, stopTime))
+end
+
+
+
 %% Output the results in the CCAMLR-formatted spreadsheet format
 % This is format for WG-ASAM to use to collate acoustic survey results
 % Use the generated csv file to import into the spreadsheet

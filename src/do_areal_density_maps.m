@@ -4,13 +4,13 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     % Use the same max scale across all plots
     maxRho = max(nasc.rho);
     maxSize = 200; % [points^2] of drawn circles
-    legendScatterSizes = [50 500 2500 5000]; % [g/m^2]
+    legendScatterSizes = [50 500 5000]; % [g/m^2]
 
     % Map coloured by vessel, CCAMLR 2000 strata
     figure(1)
     clf
     s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
-    plot_standard_map(strata, 'showStrataNames', false, 'strataToPlot', s)
+    plot_standard_map(strata, 'showStrataNames', false, 'strataToPlot', s, 'rotation', 0)
 
     % Use a different colour for each vessel
     %v = unique(nasc.Vessel);
@@ -63,7 +63,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     % Use a different colour and symbol for each statum
 
     s = unique(nasc.Stratum);
-    symbols = {'o' 'o' 'o' 'o' 'o' 'o' 'o' 'd' 'd' 'd' 'd' 'd' 'd' 'd' '<'};
+    symbols = {'o' 'o' 'o' 'o' 'o' 'o' 'o' 'd' 'd' 'd' 'd' 'd' 'd' 'd' '<' '<'};
     h = nan(size(s));
     for i = 1:length(s)
         j = find(nasc.Stratum == s(i));
@@ -85,7 +85,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     s = ["Bransfield" "Elephant" "Joinville" "West"];
     plot_standard_map(strata, 'centrePoint', [-58 -62], 'radius', 4, ...
         'strataToPlot', s, 'showStrataNames', true, ...
-        'coastDetail', 'high')
+        'coastDetail', 'high', 'rotation', 0)
 
     for i = 1:length(s)
         j = find(nasc.Stratum == s(i));
@@ -121,7 +121,8 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     s = ["ESS" "Sand" "SG" "SS" "AP" "SSI" "SOI"];
     plot_standard_map(strata, 'centrePoint', [-45 -60], 'radius', 17.5, ...
         'strataToPlot', s, 'showStrataNames', true, ...
-        'coastDetail', 'intermediate', 'showSubAreas', true)
+        'coastDetail', 'intermediate', 'showSubAreas', true, ...
+        'rotation', 0)
 
     for i = 1:length(s)
         j = find(nasc.Stratum == s(i));
@@ -148,7 +149,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     s = ["SOI" "SOC" "SOF"];
     plot_standard_map(strata, 'centrePoint', [-45.7 -60.75], 'radius', 2.5, ...
         'strataToPlot', s, 'showStrataNames', true, ...
-        'coastDetail', 'fine')
+        'coastDetail', 'fine', 'rotation', 0)
 
     for i = 1:length(s)
         j = find(nasc.Stratum == s(i));
@@ -172,8 +173,8 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     figure(7)
     clf
     
-    plot_standard_map(strata, 'showStrataNames', false, 'centrePoint', [-45 -65], ...
-        'rotation', 45, 'radius', 40, 'strataColour', 'k')
+    plot_standard_map(strata, 'showStrataNames', false, 'centrePoint', [-45 -60], ...
+        'rotation', 0, 'radius', 30, 'strataColour', 'k')
     %m_coast('patch',[0.5 0.5 0.5]);
     m_grid('xticklabel',[],'yticklabel',[],'linestyle',':', 'box', 'off')
         

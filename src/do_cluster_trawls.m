@@ -398,7 +398,8 @@ crop_image(ifile)
 %%%%%%%%%%%%%%%%%%%%%%
 figure(7) % Map of stations and strata
 clf
-plot_standard_map(strata, 'showStrataNames', false)
+plot_standard_map(strata, 'showStrataNames', false, 'rotation', 0, ...
+    'radius', 18)
 
 % plot the station positions
 clear h labels
