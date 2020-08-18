@@ -26,6 +26,7 @@ results = calcBiomass(nasc, strata_area, surveys);
 % and what if we exclude the night data?
 nasc_day = nasc(nasc.civilDaytime == true,:);
 results_day = calcBiomass(nasc_day, strata_area, surveys);
+results.biomass_strata_day = results_day.biomass_strata;
 
 % and put the daytime density ratios (and biomass, it's the same number) into the results structure
 results.biomass_strata.dayRatio = results_day.biomass_strata.meanDensity ./ results.biomass_strata.meanDensity;

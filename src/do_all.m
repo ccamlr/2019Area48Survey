@@ -66,6 +66,15 @@ for i = 1:height(results.biomass_survey)
         r.CV)
 end
 
+% data only biomass per strata
+disp('day only strata biomass')
+for i = 1:height(results.biomass_strata_day)
+    r = results.biomass_strata_day(i,{'name' 'meanDensity' 'biomass'});
+    fprintf('%s; %.1f; %s\n', r.name{1}, ...
+        r.meanDensity, ...
+        jf.format(round(r.biomass/1e3)*1e3))
+end
+
 % report the start and stop survey dates for each stratum
 strata = unique(results.nasc.Stratum);
 for i = 1:length(strata)
