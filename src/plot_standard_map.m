@@ -10,6 +10,7 @@ p.addOptional('rotation', 45)
 p.addOptional('strataToPlot', []);
 p.addOptional('coastDetail', 'low');
 p.addOptional('showSubAreas', false)
+p.addOptional('showSubAreaNames', true)
 p.addOptional('strataColour', [0.5 0.5 0.5])
 
 parse(p, varargin{:});
@@ -24,15 +25,15 @@ m_proj('Azimuthal Equal-area', ...
 patchColour = [0.5 0.5 0.5];
 switch p.Results.coastDetail
     case 'coarse'
-        m_gshhs_c('patch', patchColour);
+        m_gshhs_c('patch', 'FaceColor', patchColour);
     case 'low'
-        m_gshhs_l('patch', patchColour);
+        m_gshhs_l('patch', 'FaceColor', patchColour);
     case 'intermediate'
-        m_gshhs_i('patch', patchColour);
+        m_gshhs_i('patch', 'FaceColor', patchColour);
     case 'high'
-        m_gshhs_h('patch', patchColour);
+        m_gshhs_h('patch', 'FaceColor', patchColour);
     case 'fine'
-        m_gshhs_f('patch', patchColour);
+        m_gshhs_f('patch', 'FaceColor', patchColour);
 end
 
 hold on
@@ -44,8 +45,10 @@ if p.Results.showSubAreas
     for i = 1:length(b.ncst)
         if ismember(b.dbfdata{i,2}, areas)
             m_line(b.ncst{i}(:,1), b.ncst{i}(:,2), 'color', 'k')
-            m_text(min(b.ncst{i}(:,1)), max(b.ncst{i}(:,2)), b.dbfdata{i,2}(9:end), ...
-                'HorizontalAlignment', 'left', 'VerticalAlignment', 'top')
+            if p.Results.showSubAreaNames
+                m_text(min(b.ncst{i}(:,1)), max(b.ncst{i}(:,2)), b.dbfdata{i,2}(9:end), ...
+                    'HorizontalAlignment', 'left', 'VerticalAlignment', 'top')
+            end
         end
     end
 end
