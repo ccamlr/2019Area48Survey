@@ -68,6 +68,8 @@ writetable(results.nasc, fullfile(resultsDir, 'NASC for cross-checking.csv'))
 
 do_areal_density_maps(results.nasc, strata, 'Krill density', resultsDir)
 do_areal_density_maps(results.nasc_day, strata, 'Day krill density', resultsDir)
+do_day_night_coverage_maps(results.nasc, results.nasc_day, strata, 'Day_night', resultsDir)
+do_location_maps(strata, resultsDir)
 
 % optional - compare rho values with the Echoview template using a -30 and
 % -40 dB threshold in the noise removal 

@@ -81,9 +81,9 @@ for i = 1:length(strata)
     s = strcmp(results.nasc.Stratum, strata(i));
     startTime = min(results.nasc.Ping_timestamp(s));
     stopTime = max(results.nasc.Ping_timestamp(s));
-    disp(sprintf('%s, %s, %s', strata(i), startTime, stopTime))
+    fprintf('%s, %s, %s, %d\n', strata(i), datestr(startTime, 'dd mmm yyyy'), ...
+        datestr(stopTime, 'dd mmm yyyy'), sum(s))
 end
-
 
 
 %% Output the results in the CCAMLR-formatted spreadsheet format
@@ -148,6 +148,7 @@ writetable(t, fullfile(resultsDir, 'WG_EMM_krill_biomass_time_series_information
 
 %% Show the comparison of KPH swarm verses dB-difference krill classification
 do_define_directories
+resultsDir = resultsDir2; % use old data...
 load(fullfile(resultsDir, 'Final results - swarm'), 'results')
 results_swarm = results;
 load(fullfile(resultsDir, 'Final results  - dB difference - KPH'), 'results')
@@ -162,6 +163,7 @@ for i = 1:length(results_dBdiff.strata)
         for j = 1:length(results_dBdiff.strata(i).transect)
             name = string(results_dBdiff.strata(i).name) + results_dBdiff.strata(i).transect(j).name;
             transect.name(k,1) = name;
+            transect.strata(k,1) = string(results_dBdiff.strata(i).name);
             transect.rho_dB(k,1) =  results_dBdiff.strata(i).transect(j).krillDensity;
             transect.rho_swarm(k,1) = results_swarm.strata(i).transect(j).krillDensity;
             transect.length(k,1) = results_swarm.strata(i).transect(j).length;
@@ -205,17 +207,26 @@ end
 
 % A plot of the data with regression
 mdl = fitlm(transect.rho_swarm, transect.rho_dB);
+ci = coefCI(mdl, 0.05);
 % avoids Stats toolbox
 % p = polyfit(transect.rho_swarm, transect.rho_dB, 1) 
-eqn = {"\rho_{dB} = " + num2str(mdl.Coefficients.Estimate(2), '%.2f') + ...
-    "\rho_{swarm} + " + num2str(mdl.Coefficients.Estimate(1), '%.2f')  ...
+eqn = {"\rho_{dB} = " + num2str(mdl.Coefficients.Estimate(2), '%.1f') + ...
+       " \pm " + num2str(mdl.Coefficients.Estimate(2) - ci(2,1), '%.1f') + ...
+       "\rho_{swarm} + " + num2str(mdl.Coefficients.Estimate(1), '%.1f') + ...
+       " \pm " + num2str(mdl.Coefficients.Estimate(1) - ci(1,1), '%.1f')
     "r^2 = " + num2str(mdl.Rsquared.Adjusted, '%.3f')};
 m = max([transect.rho_swarm; transect.rho_dB]);
 
 figure(1)
 clf
-plot(transect.rho_swarm, transect.rho_dB, 'ko', 'MarkerFaceColor', 'k')
-hold on
+strata_symbols = {'p', '<', 'o', 's', 'd'};
+strata = unique(transect.strata);
+for i = 1:length(strata)
+    j = find(transect.strata == strata(i));
+    plot(transect.rho_swarm(j), transect.rho_dB(j), 'LineStyle', 'none', ...
+        'Marker', strata_symbols{i}, 'MarkerFaceColor', 'k', 'MarkerEdgeColor', 'k')
+    hold on
+end
 plot([0 m],  mdl.Coefficients.Estimate(2) * [0 m] + mdl.Coefficients.Estimate(1), 'k', 'LineWidth', 1.5)
 grid
 xlabel('Areal density, swarms (g m^{-2})')
