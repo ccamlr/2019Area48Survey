@@ -148,7 +148,7 @@ writetable(t, fullfile(resultsDir, 'WG_EMM_krill_biomass_time_series_information
 
 %% Show the comparison of KPH swarm verses dB-difference krill classification
 do_define_directories
-resultsDir = resultsDir2; % use old data...
+resultsDir = resultsDir2019; % Use old data for this.
 load(fullfile(resultsDir, 'Final results - swarm'), 'results')
 results_swarm = results;
 load(fullfile(resultsDir, 'Final results  - dB difference - KPH'), 'results')
@@ -210,10 +210,10 @@ mdl = fitlm(transect.rho_swarm, transect.rho_dB);
 ci = coefCI(mdl, 0.05);
 % avoids Stats toolbox
 % p = polyfit(transect.rho_swarm, transect.rho_dB, 1) 
-eqn = {"\rho_{dB} = " + num2str(mdl.Coefficients.Estimate(2), '%.1f') + ...
+eqn = {"\rho_{dB} = (" + num2str(mdl.Coefficients.Estimate(2), '%.1f') + ...
        " \pm " + num2str(mdl.Coefficients.Estimate(2) - ci(2,1), '%.1f') + ...
-       "\rho_{swarm} + " + num2str(mdl.Coefficients.Estimate(1), '%.1f') + ...
-       " \pm " + num2str(mdl.Coefficients.Estimate(1) - ci(1,1), '%.1f')
+       ")\rho_{swarm} + (" + num2str(mdl.Coefficients.Estimate(1), '%.1f') + ...
+       " \pm " + num2str(mdl.Coefficients.Estimate(1) - ci(1,1), '%.1f)')
     "r^2 = " + num2str(mdl.Rsquared.Adjusted, '%.3f')};
 m = max([transect.rho_swarm; transect.rho_dB]);
 
