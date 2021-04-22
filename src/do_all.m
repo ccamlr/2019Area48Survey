@@ -239,3 +239,9 @@ ifile = fullfile(resultsDir, 'Swarms verses dB-diff - regression.png');
 print(ifile, '-r300', '-dpng')
 crop_image(ifile)
 
+% and a version for the paper
+ifile = fullfile(resultsDir, 'Figure 6.tiff');
+print(ifile, '-r1000', '-dtiff')
+crop_image(ifile)
+
+

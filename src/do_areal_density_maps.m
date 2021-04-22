@@ -107,8 +107,8 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     
     % and a version for the paper
     if strcmp(prefix, 'Krill density')
-        ifile = fullfile(saveDir,  'Figure 6d.png');
-        print(ifile, '-dpng','-r600')
+        ifile = fullfile(saveDir,  'Figure 8c.tiff');
+        print(ifile, '-dtiff','-r1000')
         crop_image(ifile)
     end
 
@@ -136,8 +136,8 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
 
     % and a version for the paper
     if strcmp(prefix, 'Krill density')
-        ifile = fullfile(saveDir,  'Figure 6b.png');
-        print(ifile, '-dpng','-r600')
+        ifile = fullfile(saveDir,  'Figure 8a.tiff');
+        print(ifile, '-dtiff','-r1000')
         crop_image(ifile)
     end
     
@@ -163,8 +163,8 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     
     % and a version for the paper
     if strcmp(prefix, 'Krill density')
-        ifile = fullfile(saveDir,  'Figure 6c.png');
-        print(ifile, '-dpng','-r600')
+        ifile = fullfile(saveDir,  'Figure 8b.tiff');
+        print(ifile, '-dtiff','-r1000')
         crop_image(ifile)
     end
     
@@ -181,15 +181,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     ifile = fullfile(saveDir, 'globe with survey area.png');
     print(ifile, '-dpng','-r300')
     crop_image(ifile)
-    
-    % and a version for the paper
-    if strcmp(prefix, 'Krill density')
-        ifile = fullfile(saveDir,  'Figure 6a.png');
-        print(ifile, '-dpng','-r600')
-        crop_image(ifile)
-    end
 
-    
 end
 
 

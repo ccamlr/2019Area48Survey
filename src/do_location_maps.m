@@ -17,6 +17,11 @@ function do_location_maps(strata, saveDir)
     print(ifile, '-dpng','-r600')
     crop_image(ifile)
 
+    % Publication quality version 
+    ifile = fullfile(saveDir,  'Figure 1d.tiff');
+    print(ifile, '-dtiff','-r1000')
+    crop_image(ifile)
+
     %%%%%%%%%%%
     % CCAMLR 2000 strata and transects
     figure(2)
@@ -32,7 +37,15 @@ function do_location_maps(strata, saveDir)
     ifile = fullfile(saveDir,  'Figure 1b.png');
     print(ifile, '-dpng','-r600')
     crop_image(ifile)
-    
+
+    % Publication quality version 
+    % Remove -70S tick label that interferences with the longitude
+    m_grid('ytick', ([-50 -55 -60 -65]))
+
+    ifile = fullfile(saveDir,  'Figure 1b.tiff');
+    print(ifile, '-dtiff','-r1000')
+    crop_image(ifile)
+
     %%%%%%%%%%%
     % Zoom on the South Orkney strata and transects
     figure(3)
@@ -48,6 +61,11 @@ function do_location_maps(strata, saveDir)
     print(ifile, '-dpng','-r600')
     crop_image(ifile)
     
+    % Publication quality version 
+    ifile = fullfile(saveDir,  'Figure 1c.tiff');
+    print(ifile, '-dtiff','-r1000')
+    crop_image(ifile)
+    
     %%%%%%%%%%%%%
     % a map of where we are in the world
     figure(4)
@@ -60,6 +78,11 @@ function do_location_maps(strata, saveDir)
         
     ifile = fullfile(saveDir,  'Figure 1a.png');
     print(ifile, '-dpng','-r600')
+    crop_image(ifile)
+    
+    % Publication quality version     
+    ifile = fullfile(saveDir,  'Figure 1a.tiff');
+    print(ifile, '-dtiff','-r1000')
     crop_image(ifile)
     
 end

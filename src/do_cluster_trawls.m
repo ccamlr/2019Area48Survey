@@ -424,8 +424,8 @@ print(ifile, '-dpng','-r300')
 crop_image(ifile)
 
 % and a version for the paper
-ifile = fullfile(resultsDir, 'Figure 1.png');
-print(ifile, '-dpng','-r600')
+ifile = fullfile(resultsDir, 'Figure 2.tiff');
+print(ifile, '-dtiff','-r1000')
 crop_image(ifile)
 
 
@@ -476,8 +476,8 @@ print(ifile, '-dpng', '-r300')
 crop_image(ifile)
 
 % and a version for the paper
-ifile = fullfile(resultsDir, 'Figure 3.png');
-print(ifile, '-dpng', '-r600')
+ifile = fullfile(resultsDir, 'Figure 3.tiff');
+print(ifile, '-dtiff', '-r1000')
 crop_image(ifile)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

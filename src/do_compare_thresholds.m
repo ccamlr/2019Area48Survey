@@ -5,8 +5,8 @@
 
 do_define_directories
 
-load(fullfile(resultsDir, 'Final results - swarm'), 'results');
-results2019 = load(fullfile(resultsDir2, 'Final results - swarm'), 'results');
+load(fullfile(resultsDir2020, 'Final results - swarm'), 'results');
+results2019 = load(fullfile(resultsDir2019, 'Final results - swarm'), 'results');
 results2019 = results2019.results;
 
 [N2019, edges2019] = histcounts(log10(results2019.nasc.rho));
@@ -40,4 +40,9 @@ ifile = fullfile(resultsDir, 'Threshold rho comparison.png');
 print(ifile, '-dpng','-r300')
 crop_image(ifile)
     
+% and a version for the paper
+ifile = fullfile(resultsDir, 'Figure 7.tiff');
+print(ifile, '-dtiff','-r1000')
+crop_image(ifile)
+
     
