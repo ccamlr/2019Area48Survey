@@ -23,8 +23,8 @@ function do_day_night_coverage_maps(nasc_all, nasc_day, strata, prefix, saveDir)
     end
     m_grid('box', 'on')
     
-    ifile = fullfile(saveDir,  'Figure 7b.png');
-    print(ifile, '-dpng','-r600')
+    ifile = fullfile(saveDir,  'Figure 5b.tiff');
+    print(ifile, '-dtiff','-r1000')
     crop_image(ifile)
 
     %%%%%%%%%%%
@@ -47,8 +47,8 @@ function do_day_night_coverage_maps(nasc_all, nasc_day, strata, prefix, saveDir)
     end
     m_grid('box', 'on')
      
-    ifile = fullfile(saveDir,   'Figure 7a.png');
-    print(ifile, '-dpng','-r600')
+    ifile = fullfile(saveDir,   'Figure 5a.tiff');
+    print(ifile, '-dtiff','-r1000')
     crop_image(ifile)
 
     %%%%%%%%%%%
@@ -70,8 +70,8 @@ function do_day_night_coverage_maps(nasc_all, nasc_day, strata, prefix, saveDir)
     end
     m_grid('box', 'on')
      
-    ifile = fullfile(saveDir, 'Figure 7c.png');
-    print(ifile, '-dpng','-r600')
+    ifile = fullfile(saveDir, 'Figure 5c.tiff');
+    print(ifile, '-dtiff','-r1000')
     crop_image(ifile)
  
 end
