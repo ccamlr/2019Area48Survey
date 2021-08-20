@@ -14,6 +14,6 @@ end
 m_grid('box', 'on')
 
 leg = legend(bubleg, legentry, 'Location', 'SouthEast');
-title(leg, '\rho (g\cdotm^{-2})')
+title(leg, ['\rho (g\cdotm^{' char(8211) '2})'], 'Interpreter', 'tex')
 set(leg, 'fontWeight', 'normal')
 legend('boxoff')

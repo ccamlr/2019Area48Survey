@@ -229,8 +229,8 @@ for i = 1:length(strata)
 end
 plot([0 m],  mdl.Coefficients.Estimate(2) * [0 m] + mdl.Coefficients.Estimate(1), 'k', 'LineWidth', 1.5)
 grid
-xlabel('Areal density, swarms (g m^{-2})')
-ylabel('Areal density, dB-difference (g m^{-2})')
+xlabel(['Areal density, swarms (g m^{' char(8211) '2})'])
+ylabel(['Areal density, dB-difference (g m^{' char(8211) '2})'])
 
 set(gca, 'XLim', [0 m], 'YLim', [0 m])
 textLoc(eqn, 'NorthWest');

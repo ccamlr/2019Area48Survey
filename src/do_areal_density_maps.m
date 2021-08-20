@@ -215,7 +215,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
     cb_step = (cb_lim(2)-1)/(length(levels)-1);
     set(h, 'Ticks', cb_lim(1) + (0:cb_lim(2)-1) * cb_step, 'TickLabels', levels(1:end-1))
     set(h, 'Position', [0.45 0.2 0.4 0.04])
-    title(h, 'Krill density (g m^{-2})')
+    title(h, ['Krill density (g m^{' char(8211) '2})'])
     
     ifile = fullfile(saveDir,   [prefix ' - CCAMLR 2000 - surface density.png']);
     print(ifile, '-dpng','-r300')
@@ -223,7 +223,7 @@ function do_areal_density_maps(nasc, strata, prefix, saveDir)
 
     % and a version for the paper
     ifile = fullfile(saveDir,  'Figure 9b.tiff');
-    print(ifile, '-dtiff','-r600')
+    print(ifile, '-dtiff','-r1000')
     crop_image(ifile)
 
     %%

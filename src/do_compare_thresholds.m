@@ -32,7 +32,7 @@ hold on
 plot(distance2020, cumsum(results.nasc.rho), 'k', 'LineWidth', 1.5)
 %title('Cumulative krill density')
 %legend('-40 dB', '-30 dB', 'Location', 'NorthWest')
-ylabel({'Cumulative krill density (g m^{-2})'})
+ylabel(['Cumulative krill density (g m^{' char(8211) '2})'])
 xlabel('Cumulative transect distance (km)')
 %textLoc('(b)', 'NorthWest');
 
