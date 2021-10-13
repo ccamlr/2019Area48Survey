@@ -424,8 +424,8 @@ print(ifile, '-dpng','-r300')
 crop_image(ifile)
 
 % and a version for the paper
-ifile = fullfile(resultsDir, 'Figure 2.tiff');
-print(ifile, '-dtiff','-r1000')
+ifile = fullfile(resultsDir, 'Figure 1.png');
+print(ifile, '-dpng','-r600')
 crop_image(ifile)
 
 
@@ -459,13 +459,15 @@ for i = 1:length(lf.strata)
     st_name = strata.features(i).properties.stratum;
     if ismember(st_name, {'AP' 'SS' 'Sand'})
         subplot(1,3,j)
+        renormalised_counts = lf.strata(i).ASAM2019_normalised_lf_prop / sum(lf.strata(i).ASAM2019_normalised_lf_prop);
         histogram('BinEdges', lf.strata(i).ASAM2019_normalised_lf_len, ...
-            'BinCounts', lf.strata(i).ASAM2019_normalised_lf_prop, 'EdgeColor', 'none', ...
+            'BinCounts', renormalised_counts*100, 'EdgeColor', 'none', ...
             'FaceColor', 'k')
         axis square
         textLoc(lf.strata(i).stratum, 'NorthWest');
-        if i >= 10
-            xlabel('Length (mm)')
+        xlabel('Length (mm)')
+        if i == 1
+            ylabel('Frequency (%)')
         end
         j = j + 1;
     end
