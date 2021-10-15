@@ -464,10 +464,11 @@ for i = 1:length(lf.strata)
             'BinCounts', renormalised_counts*100, 'EdgeColor', 'none', ...
             'FaceColor', 'k')
         axis square
+        ylim([0 8])
         textLoc(lf.strata(i).stratum, 'NorthWest');
         xlabel('Length (mm)')
         if i == 1
-            ylabel('Frequency (%)')
+            ylabel('Proportion (%)')
         end
         j = j + 1;
     end
